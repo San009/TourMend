@@ -117,6 +117,9 @@ Future<bool> _onBackPressed() {
         
          
   }
+
+
+
 int _selectedIndex=0;
 static const TextStyle optionStyle = TextStyle(fontSize:30);
 static const List<Widget> _widgetOption =<Widget>[
@@ -191,10 +194,10 @@ Text(
               ),
             )
             ),
-          customListTile(Icons.person,'Profile',()=>{} ),
-          customListTile(Icons.notifications,'Notification',()=>{} ),
-          customListTile(Icons.settings,'Setting',()=>{} ),
-          customListTile(Icons.lock,'LogOut',()=> {
+          CustomListTile(Icons.person,'Profile',()=>{} ),
+          CustomListTile(Icons.notifications,'Notification',()=>{} ),
+          CustomListTile(Icons.settings,'Setting',()=>{} ),
+          CustomListTile(Icons.lock,'LogOut',()=> {
               _handleLogout()
               //
           } ),
@@ -217,28 +220,30 @@ Text(
         onSelectTab: (index) {
           setState(() {
             selectedIndex = index;
+             
           });
         },
         items: [
           FFNavigationBarItem(
-            iconData: Icons.calendar_today,
-            label: 'Schedule',
+            iconData: Icons.place,
+            label: 'Places',
+            
           ),
           FFNavigationBarItem(
-            iconData: Icons.people,
-            label: 'Contacts',
+            iconData: Icons.map,
+            label: 'Maps',
           ),
           FFNavigationBarItem(
-            iconData: Icons.attach_money,
-            label: 'Bills',
+            iconData: Icons.home,
+            label: 'Home',
           ),
           FFNavigationBarItem(
-            iconData: Icons.note,
-            label: 'Notes',
+            iconData: Icons.assessment,
+            label: 'News',
           ),
           FFNavigationBarItem(
-            iconData: Icons.settings,
-            label: 'Settings',
+            iconData: Icons.save,
+            label: 'Saved',
           ),
         ],
       ),
@@ -253,14 +258,13 @@ Text(
 }
 
 
-class customListTile extends StatelessWidget {
+class CustomListTile extends StatelessWidget {
 
-  
- IconData icon;
- String text;
- Function onTap;
+ final IconData icon;
+  final String text;
+  final Function onTap;
 
- customListTile(this.icon,this.text,this.onTap);
+ CustomListTile(this.icon,this.text,this.onTap);
   @override
   Widget build(BuildContext context)
  {
