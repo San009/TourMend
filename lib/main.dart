@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_login_signup/src/Main/Mainpage.dart';
 import 'package:google_fonts/google_fonts.dart';
-
+import 'src/loginPage.dart';
 import 'src/loginPage.dart';
 //import 'src/Main/Mainpage.dart';
 void main() => runApp(MyApp());
@@ -21,7 +22,7 @@ class MyApp extends StatelessWidget {
       ),
       debugShowCheckedModeBanner: false,
       home: LoginPage(),
-
+      //home: MainPage(),
     );
   }
 }

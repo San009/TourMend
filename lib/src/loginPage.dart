@@ -3,60 +3,114 @@ import 'package:flutter_login_signup/src/signup.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
-import '../src/Main/Mainpage.dart';
+import 'package:flutter_login_signup/src/Main/Mainpage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
+import 'package:email_validator/email_validator.dart';
+
+
 
 class LoginPage extends StatefulWidget {
+
+  LoginPage({Key key, this.title}) : super(key: key);
+
+  final String title;
+
   @override
   _LoginPageState createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
-
+  bool _showPassword = false;
   bool _isLoading = false;
- bool visible = false ;
- 
-TextEditingController user=new TextEditingController();
-TextEditingController pass=new TextEditingController();
-  
+  bool visible = false ;
+  final scaffoldKey = GlobalKey<ScaffoldState>();
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+
+  SharedPreferences logindata;
+  bool newuser;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    check_if_already_login();
+  }
+  void check_if_already_login() async {
+    
+    logindata = await SharedPreferences.getInstance();
+    newuser = (logindata.getBool('login') ?? true);
+    print(newuser);
+    if (newuser == false) {
+      Navigator.pushReplacement(
+          context, new MaterialPageRoute(builder: (context) => MainPage()));
+    }
+  }
+  @override
+  void dispose() {
+    // Clean up the controller when the widget is disposed.
+    emailController.dispose();
+   passwordController.dispose();
+    super.dispose();
+  }
+    final formKey = GlobalKey<FormState>();
+    
+    String _email;
+    String _password;
+
+Container All(){
+
+final form = formKey.currentState;
+
+    if (form.validate()) {
+     SignIn();
+      // Email & password matched our validation rules
+      // and are saved to _email and _password fields.
+     }else{
+       return  null;
+     
+    }
+}
+
  Future SignIn() async {
 
-
-   // setState(() {
-  //visible = true ; 
-  //});
- 
+    setState(() {
+  visible = true ; 
+  });
  
 
-   
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    var data = {
-    "username": user.text,
-    "password": pass.text,
-    };
-    
-    
+  String _email = emailController.text;
+  String _password = passwordController.text;
+ 
+  if (_email != '' && _password != '') {
+                  print('Successfull');
+                  logindata.setBool('login', false);
+                  logindata.setString('username', _email);
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => MainPage()));
+                }
+
+
+
+    var data = {'email': _email, 'password' : _password};
     var url ="http://10.0.2.2/TourMendWebServices/Login.php";
     var response = await http.post(url, body: json.encode(data));
     var message = jsonDecode(response.body);
-    if(message == 'Login Matched')
+    if( message=="Login Matched")
    {
-       setState(() {
-      visible = false; 
-      });    Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => MainPage())
-      );
-   }else{
- 
+       
+      
+       Navigator.push(context,
+        MaterialPageRoute(builder: (context) => MainPage()));
+   }
+   else{
     // If Email or Password did not Matched.
     // Hiding the CircularProgressIndicator.
-      setState(() {
-      visible = false;
+     setState(() {
+      visible = false; 
       });
-     
-   } showDialog(
+
+   showDialog(
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
@@ -66,19 +120,22 @@ TextEditingController pass=new TextEditingController();
             child: new Text("OK"),
             onPressed: () {
               Navigator.of(context).pop();
-            },
+            }
           ),
         ],
       );
     },
-    );
+    );}
  
- }
+}void _loginCommand() {
+  SignIn();
+  }
+ 
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light.copyWith(statusBarColor: Colors.transparent));
     return Scaffold(
-      
+      key: scaffoldKey,
      body: SingleChildScrollView(
         child: Container(
           height: MediaQuery
@@ -96,14 +153,11 @@ TextEditingController pass=new TextEditingController();
                 Expanded(
                   flex: 3,
                   child: 
-                
-         _isLoading ? Center(
-         ) : ListView(
+          ListView(
           children: <Widget>[
             headerSection(),
             textSection(),
             buttonSection(),
-           
             divider(),
             gmailButton(),
             createAccountLabel(),
@@ -128,10 +182,8 @@ TextEditingController pass=new TextEditingController();
       margin: EdgeInsets.only(top: 30.0),
       child: RaisedButton(
            onPressed: (){
-                  SignIn();
+                 All();
                 },
-          
-        
         elevation: 0.0,
         color: Colors.blue,
         child: Text("Sign In", style: TextStyle(color: Colors.white70,fontSize: 18,
@@ -140,42 +192,56 @@ TextEditingController pass=new TextEditingController();
       ),
     );
   }
-
-
-
- 
-  Container textSection() {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 15.0, vertical: 20.0),
-      child: Column(
-        children: <Widget>[
-          TextFormField(
-            controller: user,
+  
+  Widget textSection() {
+         return Form(
+          key: formKey,
+          child:Container(
+          padding: new EdgeInsets.symmetric(horizontal: 15.0, vertical: 20.0),
+           child: Column(
+           children:<Widget>[
+           new   TextFormField(
+            controller: emailController,
             cursorColor: Colors.black,
-
             style: TextStyle(color: Colors.black),
             decoration: InputDecoration(
               icon: Icon(Icons.email, color: Colors.black),
               labelText: 'Email',
               border: UnderlineInputBorder(borderSide: BorderSide(color: Colors.blue)),
-              hintStyle: TextStyle(color: Colors.black),
-            ),
-          ),
-          SizedBox(height: 30.0),
+              hintStyle: TextStyle(color: Colors.black)),
+               validator: (val) => !EmailValidator.Validate(val, true)
+                    ? ''
+                    : null,
+                onSaved: (val) => _email = val,
+            ),SizedBox(height: 30.0),
           TextFormField(
-            controller: pass,
+            controller: passwordController,
             cursorColor: Colors.black,
-            obscureText: true,
+            obscureText: !this._showPassword,
             style: TextStyle(color: Colors.black),
             decoration: InputDecoration(
               icon: Icon(Icons.lock, color: Colors.black),
               labelText: 'Password',
+           suffixIcon: IconButton(
+          icon: Icon(
+            Icons.remove_red_eye,
+            color: this._showPassword ? Colors.blue : Colors.grey,
+          ),
+          onPressed: () {
+            setState(() => this._showPassword = !this._showPassword);
+          },
+        ),
               border: UnderlineInputBorder(borderSide: BorderSide(color: Colors.blue)),
               hintStyle: TextStyle(color: Colors.white70),
-            ),
+          ),   validator: (val) =>
+                    val.length < 4 ? '' : null,
+                onSaved: (val) => _password = val,
+                
+            
           ),
         ],
       ),
+    )
     );
   }
 
@@ -220,8 +286,17 @@ TextEditingController pass=new TextEditingController();
                   fontSize: 13,
                   fontWeight: FontWeight.w600),
             ),
-          )
-        ],
+          ),
+          
+        
+         Visibility(
+          visible: visible, 
+          child: Container(
+            margin: EdgeInsets.only(bottom: 30),
+            child: CircularProgressIndicator()
+            )
+          ),
+        ]
       ),
     );
   }

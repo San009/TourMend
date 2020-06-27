@@ -5,44 +5,89 @@ import 'package:flutter/material.dart';
 import 'package:ff_navigation_bar/ff_navigation_bar.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
-import '../loginPage.dart';
+import 'package:flutter_login_signup/src/loginPage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: "Code Land",
-      debugShowCheckedModeBanner: false,
-      home: MainPage(),
-      theme: ThemeData(
-        accentColor: Colors.white70
+   
+ @override
+Widget build(BuildContext context) {
+  return Scaffold(
+      appBar: new AppBar(
+        title: new Text(
+          "On Back pressed",
+          style: new TextStyle(color: Colors.white),
+        ),
+      ),
+      body: new Center(
+        child: new Text("Home Page"),
       ),
     );
-  }
+    
+  
 }
-
+}
+ 
 class MainPage extends StatefulWidget {
+   MainPage({Key key, this.title}) : super(key: key);
+
+  final String title;
   @override
   _MainPageState createState() => _MainPageState();
 }
 
 class _MainPageState extends State<MainPage> {
-  SharedPreferences sharedPreferences;
+@override
 
+Future<bool> _onBackPressed() {
+  return showDialog(
+    context: context,
+    builder: (context) => new AlertDialog(
+      title: new Text('Are you sure?'),
+      content: new Text('Do you want to exit an App'),
+      actions: <Widget>[
+        new GestureDetector(
+          onTap: () => Navigator.of(context).pop(false),
+          child: Text("NO"),
+        ),
+        SizedBox(height: 16),
+        new GestureDetector(
+          onTap: () => Navigator.of(context).pop(true),
+          child: Text("YES"),
+        ),
+      ],
+    ),
+  ) ??
+      false;
+}
+  
+
+
+
+
+  SharedPreferences logindata;
+  String username;
   @override
   void initState() {
+    // TODO: implement initState
     super.initState();
-    checkLoginStatus();
+    initial();
   }
+  void initial() async {
+    logindata = await SharedPreferences.getInstance();
+    setState(() {
+      username = logindata.getString('username');
+    });
+  }
+  void _handleLogout() async {
 
-  checkLoginStatus() async {
-    sharedPreferences = await SharedPreferences.getInstance();
-    if(sharedPreferences.getString("token") == null) {
-      Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (BuildContext context) => LoginPage()), (Route<dynamic> route) => false);
-    }
+    
+        SharedPreferences logindata = await SharedPreferences.getInstance();
+        logindata.remove("username");
+        logindata.clear();
+        Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (BuildContext context) => LoginPage()), (Route<dynamic> route) => false);
   }
 int _selectedIndex=0;
 static const TextStyle optionStyle = TextStyle(fontSize:30);
@@ -75,8 +120,10 @@ Text(
  }
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
+  return WillPopScope(
+    onWillPop: _onBackPressed,
+    child: new Scaffold(
+      appBar: new AppBar(
         title: Center(child:Text("TourMend", style: TextStyle(color: Colors.white) )),
       actions: <Widget>[
           FlatButton(
@@ -120,9 +167,8 @@ Text(
           customListTile(Icons.notifications,'Notification',()=>{} ),
           customListTile(Icons.settings,'Setting',()=>{} ),
           customListTile(Icons.lock,'LogOut',()=>{
-            // sharedPreferences.clear();
-             // sharedPreferences.commit();
-             // Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (BuildContext context) => LoginPage()), (Route<dynamic> route) => false);
+              _handleLogout()
+              //
           } ),
 
          ]
@@ -168,7 +214,8 @@ Text(
           ),
         ],
       ),
-    );
+    ),
+  );
     
        
        
@@ -220,5 +267,5 @@ height: 40,
     )));
  }
 
- 
+  
 }

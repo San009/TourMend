@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
-
+import 'package:http/http.dart' as http;
+import 'dart:async';
 import 'package:flutter_login_signup/src/loginPage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:email_validator/email_validator.dart';
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../src/Main/Mainpage.dart';
 class SignUpPage extends StatefulWidget {
   SignUpPage({Key key, this.title}) : super(key: key);
 
@@ -15,52 +19,111 @@ class SignUpPage extends StatefulWidget {
 
 class _SignUpPageState extends State<SignUpPage> {
    
+  bool _isLoading = false;
+ bool visible = false ;
+ 
  
    final scaffoldKey = GlobalKey<ScaffoldState>();
-    final TextEditingController _pass = TextEditingController();
-  final TextEditingController _confirmPass = TextEditingController();
+   final nameController = TextEditingController();
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+ 
    final formKey = GlobalKey<FormState>();
-   String _email;
+  String _email;
   String _password;
 
   
-  void _submitCommand() {
-    //get state of our Form
-    final form = formKey.currentState;
+    Container All(){
 
-    //`validate()` validates every FormField that is a descendant of this Form,
-    // and returns true if there are no errors.
+final form = formKey.currentState;
+
     if (form.validate()) {
-      //`save()` Saves every FormField that is a descendant of this Form.
-      form.save();
-
+      _submitCommand();
       // Email & password matched our validation rules
       // and are saved to _email and _password fields.
-      _loginCommand();
+     }else{
+       return  null;
+     
     }
-  }
-  void _loginCommand() {
-    // Show login details in snackbar
-    final snackbar = SnackBar(
-      content: Text('Email: $_email, password: $_password'),
+}
+  
+  
+  
+  
+    Future _submitCommand() async{
+   
+    setState(() {
+  visible = true ; 
+  });
+ 
+  String name = nameController.text;
+  String _email = emailController.text;
+  String _password = passwordController.text;
+
+
+   
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+   var data = {'name': name, 'email': _email, 'password' :_password};
+    
+    var url ="http://10.0.2.2/TourMendWebServices/Register.php";
+    var response = await http.post(url, body: json.encode(data));
+ var message = jsonDecode(jsonEncode(response.body));
+    if(message == 'Register sucessfull')
+   {if(response.statusCode == 200){
+  setState(() {
+    visible = false; 
+  });
+}    Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => MainPage())
+      );
+   }else{
+ 
+    // If Email or Password did not Matched.
+    // Hiding the CircularProgressIndicator.
+      setState(() {
+      visible = false;
+      });
+     
+   }
+ showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: new Text(message),
+        actions: <Widget>[
+          FlatButton(
+            child: new Text("OK"),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      );
+    },
     );
-    scaffoldKey.currentState.showSnackBar(snackbar);
-  }
+ 
+ }
+
+
+ 
 Widget allTextField(){
           return Form(
           key: formKey,
+          
           child:Container(
         padding: new EdgeInsets.only(top:20),
            child: Column(
            children:<Widget>[
            new   TextFormField(
-             
+             controller: nameController,
                 decoration: InputDecoration(labelText: 'Usename',
                 contentPadding: EdgeInsets.only(bottom: 10)),
                validator: (value) =>
                     value.isEmpty ? '' : null,
               ),SizedBox(height: 30,),
               new    TextFormField(
+                controller: emailController,
                 decoration: InputDecoration(labelText: 'Email',
                 contentPadding: new EdgeInsets.only(bottom: 1.0)),
                 keyboardType: TextInputType.emailAddress,
@@ -70,7 +133,7 @@ Widget allTextField(){
                 onSaved: (val) => _email = val,
               ),SizedBox(height: 30,),
                new    TextFormField(
-                 controller: _pass,
+                 controller: passwordController,
                 decoration: InputDecoration(labelText: 'Password',
                 contentPadding: new EdgeInsets.only(bottom: 1.0)),
                 validator: (val) =>
@@ -80,7 +143,7 @@ Widget allTextField(){
                 
               ),SizedBox(height: 30,),
                new    TextFormField(
-                 controller: _confirmPass,
+                 
                 decoration: InputDecoration(labelText: 'Confirm Password',
                 contentPadding: new EdgeInsets.only(bottom: 1.0),
                 
@@ -88,7 +151,7 @@ Widget allTextField(){
                   validator: (val){
                               if(val.isEmpty)
                                    return '';
-                              if(val != _pass.text)
+                              if(val != passwordController.text)
                                    return 'Not Match';
                               return null;
                               },
@@ -104,31 +167,26 @@ Widget allTextField(){
    }
 
 
-  Widget _submitButton() {
-    return InkWell(
-      onTap: _submitCommand,
-      child: 
-     Container(
+  Container submitButton() {
+        return Container(
       width: MediaQuery.of(context).size.width,
-      padding: EdgeInsets.symmetric(vertical: 15),
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.all(Radius.circular(5)),
-          boxShadow: <BoxShadow>[
-            BoxShadow(
-                color: Colors.grey.shade200,
-                offset: Offset(2, 4),
-                blurRadius: 5,
-                spreadRadius: 2)
-          ],
-          color: Color(0xff00BFFF)
-          ),
-      child: Text(
-        'Register Now',
-        style: TextStyle(fontSize: 20, color: Colors.white),
+      height: 50.0,
+      padding: EdgeInsets.only(top: 0.0),
+      margin: EdgeInsets.only(top: 30.0),
+      child: RaisedButton(
+           onPressed: (){
+                 All();
+                },
+        elevation: 0.0,
+        color: Colors.blue,
+        child: Text("Sign Up", style: TextStyle(color: Colors.white70,fontSize: 18,
+                      fontWeight: FontWeight.w400)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)),
       ),
-    ));
+    );
   }
+  
+  
 
 Widget _backButton() {
     return InkWell(
@@ -245,7 +303,7 @@ Widget _backButton() {
                   height: 100,
                   width: 10,
                 ),
-                _submitButton(),
+                submitButton(),
                 Expanded(
                   flex: 2,
                   child: SizedBox(
