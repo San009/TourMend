@@ -31,21 +31,22 @@ class _LoginPageState extends State<LoginPage> {
   SharedPreferences logindata;
   bool newuser;
   @override
+
+
   void initState() {
     // TODO: implement initState
     super.initState();
     check_if_already_login();
   }
-  void check_if_already_login() async {
-    
-    logindata = await SharedPreferences.getInstance();
-    newuser = (logindata.getBool('login') ?? true);
-    print(newuser);
-    if (newuser == false) {
-      Navigator.pushReplacement(
-          context, new MaterialPageRoute(builder: (context) => MainPage()));
+  void check_if_already_login() async{
+
+      WidgetsFlutterBinding.ensureInitialized();
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      var email = prefs.getString('email');
+      print(email);
+       runApp(MaterialApp(home: email == null ? LoginPage() : MainPage()));
     }
-  }
+
   @override
   void dispose() {
     // Clean up the controller when the widget is disposed.
@@ -82,13 +83,6 @@ final form = formKey.currentState;
   String _email = emailController.text;
   String _password = passwordController.text;
  
-  if (_email != '' && _password != '') {
-                  print('Successfull');
-                  logindata.setBool('login', false);
-                  logindata.setString('username', _email);
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => MainPage()));
-                }
 
 
 
@@ -98,11 +92,12 @@ final form = formKey.currentState;
     var message = jsonDecode(response.body);
     if( message=="Login Matched")
    {
-       
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+            prefs.setString('email', '_email');
+            Navigator.pushReplacement(context,
+                 MaterialPageRoute(builder: (context) => MainPage()));
+          }
       
-       Navigator.push(context,
-        MaterialPageRoute(builder: (context) => MainPage()));
-   }
    else{
     // If Email or Password did not Matched.
     // Hiding the CircularProgressIndicator.
@@ -239,6 +234,13 @@ final form = formKey.currentState;
                 
             
           ),
+          Visibility(
+          visible: visible, 
+          child: Container(
+            margin: EdgeInsets.only(top: 30),
+            child: CircularProgressIndicator()
+            )
+          )
         ],
       ),
     )
@@ -289,13 +291,7 @@ final form = formKey.currentState;
           ),
           
         
-         Visibility(
-          visible: visible, 
-          child: Container(
-            margin: EdgeInsets.only(bottom: 30),
-            child: CircularProgressIndicator()
-            )
-          ),
+         
         ]
       ),
     );

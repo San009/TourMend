@@ -81,13 +81,41 @@ Future<bool> _onBackPressed() {
       username = logindata.getString('username');
     });
   }
-  void _handleLogout() async {
-
+ Future<bool>_handleLogout() async {
     
-        SharedPreferences logindata = await SharedPreferences.getInstance();
-        logindata.remove("username");
-        logindata.clear();
-        Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (BuildContext context) => LoginPage()), (Route<dynamic> route) => false);
+            
+ return showDialog(
+    context: context,
+    builder: (context) => new AlertDialog(
+      title: new Text('LogOut?'),
+      content: new Text('Are you sure that you want to logout?'),
+      actions: <Widget>[
+        
+        new GestureDetector(
+          onTap: () => Navigator.of(context).pop(false),
+          child: Text("Cancel"),
+        ),
+        SizedBox(height: 16),
+        
+        new GestureDetector(
+           onTap: () async { 
+             SharedPreferences prefs = await SharedPreferences.getInstance();
+            prefs.remove('email');
+            prefs.clear();
+             
+              Navigator.pushReplacement(context,
+                 MaterialPageRoute(builder: (context) => LoginPage()));
+              
+              },
+          child: Text("Logout"),
+        ),
+      ],
+    ),
+  ) ??
+      false;
+    
+        
+         
   }
 int _selectedIndex=0;
 static const TextStyle optionStyle = TextStyle(fontSize:30);
@@ -166,7 +194,7 @@ Text(
           customListTile(Icons.person,'Profile',()=>{} ),
           customListTile(Icons.notifications,'Notification',()=>{} ),
           customListTile(Icons.settings,'Setting',()=>{} ),
-          customListTile(Icons.lock,'LogOut',()=>{
+          customListTile(Icons.lock,'LogOut',()=> {
               _handleLogout()
               //
           } ),
