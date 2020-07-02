@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_login_signup/src/Main/Mainpage.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'src/loginPage.dart';
-import 'src/loginPage.dart';
-//import 'src/Main/Mainpage.dart';
-void main() => runApp(MyApp());
+import './widgets/loginPage.dart';
 
+void main() => runApp(TourMendApp());
 
-class MyApp extends StatelessWidget {
+class TourMendApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -15,14 +12,14 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'TourMend',
       theme: ThemeData(
-         primarySwatch: Colors.blue,
-         textTheme:GoogleFonts.latoTextTheme(textTheme).copyWith(
-           body1: GoogleFonts.montserrat(textStyle: textTheme.body1),
-         ),
+        primaryColor: Colors.lightBlue,
+        accentColor: Colors.greenAccent,
+        textTheme: GoogleFonts.latoTextTheme(textTheme).copyWith(
+          bodyText2: GoogleFonts.montserrat(textStyle: textTheme.bodyText2),
+        ),
       ),
       debugShowCheckedModeBanner: false,
       home: LoginPage(),
-      //home: MainPage(),
     );
   }
 }
