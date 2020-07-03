@@ -83,7 +83,35 @@ class JsonListViewWidget extends State<JsonListView> {
       builder: (context, snapshot) {
         if (!snapshot.hasData)
           return Center(child: CircularProgressIndicator());
-
+        Positioned(
+          top: 30,
+          right: 15,
+          left: 15,
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(15.0),
+            ),
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  child: TextField(
+                    cursorColor: Colors.black,
+                    keyboardType: TextInputType.text,
+                    textInputAction: TextInputAction.go,
+                    decoration: InputDecoration(
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.symmetric(horizontal: 15),
+                        hintText: "Search here"),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(right: 8.0),
+                ),
+              ],
+            ),
+          ),
+        );
         return ListView(
           children: snapshot.data
               .map((data) => Column(children: <Widget>[
@@ -177,6 +205,7 @@ class _NestedTabBarState extends State<NestedTabBar>
             child: Image.network(
               '${widget.value.placesImageURL}',
               fit: BoxFit.cover,
+              height: 250,
             ),
             padding: EdgeInsets.only(
               bottom: 2.0,

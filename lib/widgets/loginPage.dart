@@ -38,13 +38,49 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
+  Future<bool> _onBackPressed() {
+    return showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            actionsPadding: EdgeInsets.all(5.0),
+            buttonPadding: EdgeInsets.all(20.0),
+            title: Text('Are you sure?'),
+            content: Text('Do you want to exit TourMend'),
+            actions: <Widget>[
+              GestureDetector(
+                onTap: () => Navigator.of(context).pop(false),
+                child: Text(
+                  "NO",
+                  style: TextStyle(color: Colors.blueAccent),
+                ),
+              ),
+              SizedBox(height: 16),
+              GestureDetector(
+                onTap: () => Navigator.of(context).pop(true),
+                child: Text(
+                  "YES",
+                  style: TextStyle(color: Colors.redAccent),
+                ),
+              ),
+            ],
+          ),
+        ) ??
+        false;
+  }
+
   void _checkIfAlreadyLogin() async {
     _loginData = await SharedPreferences.getInstance();
     final newuser = (_loginData.getBool('login') ?? true);
     print(newuser);
     if (newuser == false) {
       Navigator.pushReplacement(
-          context, new MaterialPageRoute(builder: (context) => MainPage()));
+        context,
+        MaterialPageRoute(
+          builder: (context) => MainPage(
+            title: 'Tourmend Main Page',
+          ),
+        ),
+      );
     }
   }
 
@@ -56,8 +92,14 @@ class _LoginPageState extends State<LoginPage> {
           print('Storing in shared preferenes');
           _loginData.setBool('login', false);
           _loginData.setString('user_email', _email.text);
-          Navigator.pushReplacement(
-              context, MaterialPageRoute(builder: (context) => MainPage()));
+          Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(
+                builder: (context) => MainPage(
+                  title: 'Tourmend Main Page',
+                ),
+              ),
+              (route) => false);
         } else {
           showDialog(
             context: context,
@@ -92,35 +134,38 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light
         .copyWith(statusBarColor: Colors.transparent));
-    return Scaffold(
-      body: SingleChildScrollView(
-        child: Container(
-          height: MediaQuery.of(context).size.height,
-          child: new Stack(
-            children: <Widget>[
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Expanded(
-                      flex: 3,
-                      child: ListView(
-                        children: <Widget>[
-                          headerSection(),
-                          textSection(),
-                          buttonSection(),
-                          divider(),
-                          gmailButton(),
-                          createAccountLabel(),
-                        ],
-                      ),
-                    )
-                  ],
+    return WillPopScope(
+      onWillPop: _onBackPressed,
+      child: Scaffold(
+        body: SingleChildScrollView(
+          child: Container(
+            height: MediaQuery.of(context).size.height,
+            child: new Stack(
+              children: <Widget>[
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Expanded(
+                        flex: 3,
+                        child: ListView(
+                          children: <Widget>[
+                            headerSection(),
+                            textSection(),
+                            buttonSection(),
+                            divider(),
+                            gmailButton(),
+                            createAccountLabel(),
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
