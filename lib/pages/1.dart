@@ -60,28 +60,25 @@ class JsonListView extends StatefulWidget {
 class JsonListViewWidget extends State<JsonListView> {
   static int page = 1;
   bool isLoading = false;
-  var tList;
   Future<List> places;
   List<Placesdata> place;
-  List<Placesdata> placess = List<Placesdata>();
+  List<Placesdata> countries = List<Placesdata>();
   ScrollController _scrollController = new ScrollController();
   @override
   void initState() {
     super.initState();
     places = this.fetchPlaces(page);
     _scrollController.addListener(() {
-      print(_scrollController.position.extentAfter);
+      // print(_scrollController.position.extentAfter);
       if (_scrollController.position.pixels ==
           _scrollController.position.maxScrollExtent) {
-        places = this.fetchPlaces(page);
-
-        /*setState(() {
+        setState(() {
           print("getting data");
           places = this.fetchPlaces(page);
 
           // getProducts(false)
         });
-*/ // fetchPlaces(page);
+        // fetchPlaces(page);
 
         //fetchPlaces(page);
       }
@@ -116,18 +113,15 @@ class JsonListViewWidget extends State<JsonListView> {
           "http://10.0.2.2/TourMendWebServices/place.php?page_number=" +
               i.toString());
 
-      //  await new Future.delayed(new Duration(seconds: 2));
+      await new Future.delayed(new Duration(seconds: 2));
       if (response.statusCode == 200) {
         final items = json.decode(response.body);
 
         items.forEach((place) {
-          tList = place;
-
-          placess.add(Placesdata.fromJson(place));
+          countries.add(Placesdata.fromJson(place));
         });
-        print(placess.length);
-        return placess;
-        //return placess;
+        print(countries.length);
+        return countries;
       } else {
         throw Exception('Failed to load data.');
       }
@@ -136,9 +130,8 @@ class JsonListViewWidget extends State<JsonListView> {
       isLoading = false;
       page++;
       print("PAGE NUMBER $page");
-      // places = this.fetchPlaces(page);
+      // countries.add(Placesdata.fromJson();
       print("hello");
-      placess.add(tList);
     });
   }
 
