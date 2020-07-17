@@ -4,5 +4,7 @@
         "**/.project": true,
         "**/.settings": true,
         "**/.factorypath": true
-    }
+    },
+    "php.executablePath":"C://C://wamp64//bin//php//php7.4.0//php.exe",
+    
 }

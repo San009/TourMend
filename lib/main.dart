@@ -13,7 +13,7 @@ class TourMendApp extends StatelessWidget {
       title: 'TourMend',
       theme: ThemeData(
         primaryColor: Colors.lightBlue,
-        accentColor: Colors.greenAccent,
+        accentColor: Colors.lightBlue,
         textTheme: GoogleFonts.latoTextTheme(textTheme).copyWith(
           bodyText2: GoogleFonts.montserrat(textStyle: textTheme.bodyText2),
         ),

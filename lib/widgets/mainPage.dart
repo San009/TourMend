@@ -1,10 +1,10 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:ff_navigation_bar/ff_navigation_bar.dart';
-import 'package:flutter_app/widgets/mainPageWidgets/homePage.dart';
+import 'package:flutter_app/widgets/mainPageWidgets/homePageWidgets/homePage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import './mainPageWidgets/homePage.dart';
-import '../pages/places.dart';
+import 'mainPageWidgets/homePageWidgets/homePage.dart';
+import 'mainPageWidgets/placesWidgets/placesPage.dart';
 
 class MainPage extends StatefulWidget {
   MainPage({Key key, this.title}) : super(key: key);
@@ -19,70 +19,34 @@ class _MainPageState extends State<MainPage> {
   SharedPreferences logindata;
   String username;
   int _selectedIndex = 0;
+  static const TextStyle optionStyle = TextStyle(fontSize: 30);
+  static List<Widget> _widgetOption = <Widget>[
+    HomePage(
+      title: 'Tourmend Home Page',
+    ),
+    PlacesPage(
+      title: 'Places',
+    ),
+    Text(
+      'Index 3: Events',
+      style: optionStyle,
+    ),
+    Text(
+      'Index 4: News',
+      style: optionStyle,
+    ),
+    Text(
+      'Index 5: Saved',
+      style: optionStyle,
+    ),
+  ];
+  int selectedIndex = 0;
 
   @override
   void initState() {
     super.initState();
     initial();
   }
-
-  void initial() async {
-    logindata = await SharedPreferences.getInstance();
-    setState(() {
-      username = logindata.getString('username');
-    });
-  }
-
-  Future<bool> _onBackPressed() {
-    return showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            actionsPadding: EdgeInsets.all(5.0),
-            buttonPadding: EdgeInsets.all(20.0),
-            title: Text('Are you sure?'),
-            content: Text('Do you want to exit TourMend'),
-            actions: <Widget>[
-              GestureDetector(
-                onTap: () => Navigator.of(context).pop(false),
-                child: Text(
-                  "NO",
-                  style: TextStyle(color: Colors.blueAccent),
-                ),
-              ),
-              SizedBox(height: 16),
-              GestureDetector(
-                onTap: () => Navigator.of(context).pop(true),
-                child: Text(
-                  "YES",
-                  style: TextStyle(color: Colors.redAccent),
-                ),
-              ),
-            ],
-          ),
-        ) ??
-        false;
-  }
-
-  static const TextStyle optionStyle = TextStyle(fontSize: 30);
-  static List<Widget> _widgetOption = <Widget>[
-    HomePage(
-      title: 'Tourmend Home Page',
-    ),
-    new PlacesPage(),
-    Text(
-      'Index 1: Events',
-      style: optionStyle,
-    ),
-    Text(
-      'Index 2: News',
-      style: optionStyle,
-    ),
-    Text(
-      'Index 3: Saved',
-      style: optionStyle,
-    ),
-  ];
-  int selectedIndex = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -129,5 +93,42 @@ class _MainPageState extends State<MainPage> {
         ),
       ),
     );
+  }
+
+  void initial() async {
+    logindata = await SharedPreferences.getInstance();
+    setState(() {
+      username = logindata.getString('username');
+    });
+  }
+
+  Future<bool> _onBackPressed() {
+    return showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            actionsPadding: EdgeInsets.all(5.0),
+            buttonPadding: EdgeInsets.all(20.0),
+            title: Text('Are you sure?'),
+            content: Text('Do you want to exit TourMend'),
+            actions: <Widget>[
+              GestureDetector(
+                onTap: () => Navigator.of(context).pop(false),
+                child: Text(
+                  "NO",
+                  style: TextStyle(color: Colors.blueAccent),
+                ),
+              ),
+              SizedBox(height: 16),
+              GestureDetector(
+                onTap: () => Navigator.of(context).pop(true),
+                child: Text(
+                  "YES",
+                  style: TextStyle(color: Colors.redAccent),
+                ),
+              ),
+            ],
+          ),
+        ) ??
+        false;
   }
 }

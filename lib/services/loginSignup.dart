@@ -38,10 +38,10 @@ class LoginSignup {
         print(respJson['message']);
         return respJson['statusCode'];
       } else {
-        return 'Registering failed due to server error!';
+        return respJson['statusCode'];
       }
     } catch (e) {
-      return "Error!" + e.toString();
+      return "Error in signup()! " + e.toString();
     }
   }
 }

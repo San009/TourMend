@@ -23,6 +23,9 @@ class _SignUpPageState extends State<SignUpPage> {
 
   GlobalKey<FormState> _formKey;
 
+  bool _showPassword = true;
+  bool _isLoading = false;
+
   @override
   void initState() {
     super.initState();
@@ -34,6 +37,55 @@ class _SignUpPageState extends State<SignUpPage> {
     _confirmpass = TextEditingController();
 
     _formKey = GlobalKey<FormState>();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      key: _scaffoldKey,
+      body: _isLoading
+          ? Center(
+              child: SizedBox(
+                height: 200.0,
+                width: 200.0,
+                child: CircularProgressIndicator(
+                  strokeWidth: 5.0,
+                ),
+              ),
+            )
+          : SingleChildScrollView(
+              child: Container(
+              height: MediaQuery.of(context).size.height,
+              child: Stack(
+                children: <Widget>[
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Expanded(
+                          flex: 1,
+                          child: ListView(
+                            children: <Widget>[
+                              _title(),
+                              allTextField(),
+                              SizedBox(
+                                height: 60,
+                              ),
+                              _submitButton(),
+                              _loginAccountLabel()
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Positioned(top: 30, child: _backButton()),
+                ],
+              ),
+            )),
+    );
   }
 
   void _clearValues() {
@@ -51,35 +103,49 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 
-  _signUp() async {
-    //using shared preferences to store some values
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    sharedPreferences.setString('username', _username.text);
-    sharedPreferences.setString('user_email', _email.text);
+  void _signUp() async {
+    if (_formKey.currentState.validate()) {
+      setState(() {
+        _isLoading = true;
+      });
+      //using shared preferences to store some values
+      SharedPreferences sharedPreferences =
+          await SharedPreferences.getInstance();
+      sharedPreferences.setString('username', _username.text);
+      sharedPreferences.setString('user_email', _email.text);
 
-    LoginSignup.signup(_username.text, _email.text, _password.text)
-        .then((result) {
-      print(result);
-      if (result == '1') {
-        _clearValues();
-        _showSnackBar(context, 'User successfully created!');
-      } else if (result == '0') {
-        _clearValues();
-        _showSnackBar(context, 'Error while registering user!');
-      } else {
-        _showSnackBar(context, 'This email address already has an account');
-      }
-    });
+      LoginSignup.signup(_username.text, _email.text, _password.text)
+          .then((result) {
+        setState(() {
+          _isLoading = false;
+        });
+        print(result);
+        if (result == '1') {
+          _clearValues();
+          _showSnackBar(context,
+              'User successfully created!\nCheck your email to activate your account.');
+        } else if (result == '0') {
+          _showSnackBar(context, 'Error while registering user!');
+        } else if (result == '3') {
+          _showSnackBar(context, 'Email address is wrong');
+        } else if (result == '2') {
+          _clearValues();
+          _showSnackBar(context, 'This email address already has an account');
+        } else {
+          _showSnackBar(context, 'Internal server error!');
+        }
+      });
+    }
   }
 
   Widget allTextField() {
     return Form(
       key: _formKey,
       child: Container(
-        padding: new EdgeInsets.only(top: 20),
+        padding: EdgeInsets.only(top: 20),
         child: Column(
           children: <Widget>[
-            new TextFormField(
+            TextFormField(
               controller: _username,
               decoration: InputDecoration(
                   labelText: 'Username',
@@ -90,11 +156,11 @@ class _SignUpPageState extends State<SignUpPage> {
             SizedBox(
               height: 30,
             ),
-            new TextFormField(
+            TextFormField(
                 controller: _email,
                 decoration: InputDecoration(
                     labelText: 'Email',
-                    contentPadding: new EdgeInsets.only(bottom: 1.0)),
+                    contentPadding: EdgeInsets.only(bottom: 1.0)),
                 keyboardType: TextInputType.emailAddress,
                 validator: (val) {
                   if (val.isEmpty) {
@@ -107,31 +173,40 @@ class _SignUpPageState extends State<SignUpPage> {
             SizedBox(
               height: 30,
             ),
-            new TextFormField(
+            TextFormField(
               controller: _password,
               decoration: InputDecoration(
-                  labelText: 'Password',
-                  contentPadding: new EdgeInsets.only(bottom: 1.0)),
+                labelText: 'Password',
+                contentPadding: EdgeInsets.only(bottom: 1.0),
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    Icons.remove_red_eye,
+                    color: this._showPassword ? Colors.grey : Colors.blue,
+                  ),
+                  onPressed: () =>
+                      setState(() => _showPassword = !_showPassword),
+                ),
+              ),
               validator: (val) => val.length < 6
                   ? 'Password must be atleast 6 characters long!'
                   : null,
-              obscureText: true,
+              obscureText: _showPassword,
             ),
             SizedBox(
               height: 30,
             ),
-            new TextFormField(
+            TextFormField(
               controller: _confirmpass,
               decoration: InputDecoration(
                 labelText: 'Confirm Password',
-                contentPadding: new EdgeInsets.only(bottom: 1.0),
+                contentPadding: EdgeInsets.only(bottom: 1.0),
               ),
               validator: (val) {
                 if (val.isEmpty) return 'Enter the password for confirmation!';
                 if (val != _password.text) return 'Password didn\'t match!';
                 return null;
               },
-              obscureText: true,
+              obscureText: _showPassword,
             ),
           ],
         ),
@@ -236,54 +311,6 @@ class _SignUpPageState extends State<SignUpPage> {
               color: Color(0xfff00BFFF),
               fontSize: 40.0,
               fontWeight: FontWeight.bold)),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      key: _scaffoldKey,
-      body: SingleChildScrollView(
-          child: Container(
-        height: MediaQuery.of(context).size.height,
-        child: new Stack(
-          children: <Widget>[
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Expanded(
-                    flex: 1,
-                    child: SizedBox(),
-                  ),
-                  _title(),
-                  SizedBox(
-                    height: 30,
-                  ),
-                  allTextField(),
-                  SizedBox(
-                    height: 40,
-                  ),
-                  _submitButton(),
-                  Expanded(
-                    flex: 2,
-                    child: SizedBox(
-                      height: 0,
-                    ),
-                  )
-                ],
-              ),
-            ),
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: _loginAccountLabel(),
-            ),
-            Positioned(top: 30, left: 10, child: _backButton()),
-          ],
-        ),
-      )),
     );
   }
 }
