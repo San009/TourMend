@@ -3,7 +3,6 @@ import 'package:flutter/foundation.dart';
 import 'nestedTabBar.dart';
 import '../../../services/fetchPlaces.dart';
 import 'modal/places.dart';
-import 'placesPage.dart';
 
 class SearchPage extends StatefulWidget {
   final String tvalue;
@@ -52,12 +51,7 @@ class _SearchPageState extends State<SearchPage> {
                 FlatButton(
                   child: new Text("OK"),
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => PlacesPage(),
-                      ),
-                    );
+                    Navigator.of(context).pop();
                   },
                 ),
               ],
@@ -95,6 +89,7 @@ class _SearchPageState extends State<SearchPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: new AppBar(
+        backgroundColor: Colors.white,
         title: new Text("Your search result"),
       ),
       body: Container(
