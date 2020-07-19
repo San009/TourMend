@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'nestedTabBar.dart';
 import '../../../services/fetchPlaces.dart';
 import 'modal/places.dart';
+import 'searchlist.dart';
 
 class PlacesPage extends StatefulWidget {
   final String title;
@@ -13,21 +14,17 @@ class PlacesPage extends StatefulWidget {
 }
 
 class _PlacesPageState extends State<PlacesPage> {
-  TextEditingController _textController = TextEditingController();
-
-  final _debouncer = Debouncer(milliseconds: 500);
-  List<PlacesData> placesData;
-  List<PlacesData> filteredPlace = List();
+  TextEditingController _search = TextEditingController();
+  List<PlacesData> placesData = List();
+  List<PlacesData> filtreddata = List();
   ScrollController _scrollController;
   int pageNumber;
   bool isLoading;
-
   @override
   void initState() {
+    placesData = filtreddata;
     super.initState();
     _scrollController = ScrollController();
-    placesData = filteredPlace;
-
     pageNumber = 1;
     isLoading = true;
 
@@ -39,6 +36,7 @@ class _PlacesPageState extends State<PlacesPage> {
         });
       }
     });
+
     _scrollController.addListener(() {
       // print(_scrollController.position.extentAfter);
       if (_scrollController.position.pixels ==
@@ -68,33 +66,57 @@ class _PlacesPageState extends State<PlacesPage> {
     return Scaffold(
       appBar: AppBar(backgroundColor: Colors.white, actions: <Widget>[
         Expanded(
-          child: TextField(
-            controller: _textController,
-            cursorColor: Colors.black,
-            keyboardType: TextInputType.text,
-            textInputAction: TextInputAction.go,
-            decoration: InputDecoration(
-                prefixIcon: Icon(Icons.search),
-                border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(25.0))),
-                contentPadding: EdgeInsets.symmetric(horizontal: 5),
-                hintText: "Search here"),
-            onChanged: (string) {
-              _debouncer.run(() {
-                setState(() {
-                  filteredPlace = placesData
-                      .where((u) => (u.placeName
-                              .toLowerCase()
-                              .contains(string.toLowerCase()) ||
-                          u.destination
-                              .toLowerCase()
-                              .contains(string.toLowerCase())))
-                      .toList();
-                });
-              });
-            },
+          child: Container(
+            margin: EdgeInsets.fromLTRB(18, 2, 18, 2),
+            decoration: BoxDecoration(
+              color: Colors.grey,
+              borderRadius: BorderRadius.circular(150.0),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Expanded(
+                  child: TextField(
+                    style: TextStyle(
+                        fontSize: 20.0, height: 1.3, color: Colors.black),
+                    controller: _search,
+                    cursorColor: Colors.black,
+                    keyboardType: TextInputType.text,
+                    textInputAction: TextInputAction.go,
+                    decoration: InputDecoration(
+                      border: InputBorder.none,
+                      contentPadding: EdgeInsets.symmetric(horizontal: 15),
+                      hintText: "Search here",
+                      hintStyle: TextStyle(fontSize: 20.0, color: Colors.black),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(right: 2.0),
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => SearchPage(
+                            tvalue: _search.text,
+                          ),
+                        ),
+                      );
+                    },
+                    child: CircleAvatar(
+                        radius: 24.0,
+                        backgroundColor: Colors.deepPurple,
+                        child: Icon(
+                          Icons.search,
+                          size: 24.0,
+                        )),
+                  ),
+                ),
+              ],
+            ),
           ),
-        )
+        ),
       ]),
       body: Container(
         child: FutureBuilder<List<PlacesData>>(
@@ -106,9 +128,54 @@ class _PlacesPageState extends State<PlacesPage> {
                 child: CircularProgressIndicator(),
               );
             }
-
+            Positioned(
+              top: 30,
+              right: 15,
+              left: 15,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(15.0),
+                ),
+                child: Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: TextField(
+                        cursorColor: Colors.black,
+                        keyboardType: TextInputType.text,
+                        textInputAction: TextInputAction.go,
+                        decoration: InputDecoration(
+                            border: InputBorder.none,
+                            contentPadding:
+                                EdgeInsets.symmetric(horizontal: 15),
+                            hintText: "Search here"),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8.0),
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      SearchPage(tvalue: _search.text)));
+                        },
+                        child: CircleAvatar(
+                            radius: 15.0,
+                            backgroundColor: Colors.deepPurple,
+                            child: Icon(
+                              Icons.portrait,
+                              size: 20.0,
+                            )),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
             return ListView.builder(
-                itemCount: filteredPlace.length,
+                itemCount: placesData.length,
                 controller: _scrollController,
                 physics: AlwaysScrollableScrollPhysics(),
                 itemBuilder: (context, index) {
@@ -125,7 +192,7 @@ class _PlacesPageState extends State<PlacesPage> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => NestedTabBar(
-                            placeData: filteredPlace[index],
+                            placeData: placesData[index],
                           ),
                         ),
                       );
@@ -139,14 +206,14 @@ class _PlacesPageState extends State<PlacesPage> {
                           Padding(
                             padding: EdgeInsets.only(bottom: 10.0),
                             child: Image.network(
-                              filteredPlace[index].placesImageURL,
+                              placesData[index].placesImageURL,
                               fit: BoxFit.cover,
                             ),
                           ),
                           Row(children: <Widget>[
                             Padding(
                                 child: Text(
-                                  filteredPlace[index].placeName,
+                                  placesData[index].placeName,
                                   style: new TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 18),
@@ -156,7 +223,7 @@ class _PlacesPageState extends State<PlacesPage> {
                             Text(" | "),
                             Padding(
                                 child: Text(
-                                  filteredPlace[index].destination,
+                                  placesData[index].destination,
                                   style: new TextStyle(
                                       fontStyle: FontStyle.italic),
                                   textAlign: TextAlign.right,
