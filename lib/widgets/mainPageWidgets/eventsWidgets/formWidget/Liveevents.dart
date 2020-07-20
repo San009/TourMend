@@ -147,6 +147,49 @@ class MapScreenState extends State<LiveeventsPage>
                       mainAxisSize: MainAxisSize.min,
                       children: <Widget>[
                         new Text(
+                          'Event Address',
+                          style: TextStyle(
+                              fontSize: 16.0, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                  ],
+                )),
+            Padding(
+                padding: EdgeInsets.only(left: 25.0, right: 25.0, top: 9.0),
+                child: new Row(
+                  mainAxisSize: MainAxisSize.max,
+                  children: <Widget>[
+                    new Flexible(
+                      child: TextField(
+                        decoration: new InputDecoration(
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 5.0, horizontal: 5),
+                          hintText: 'Enter Address',
+                          border: new OutlineInputBorder(
+                            borderRadius: const BorderRadius.all(
+                              const Radius.circular(5.0),
+                            ),
+                            borderSide: new BorderSide(
+                              color: Colors.black,
+                              width: 1.0,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                )),
+            Padding(
+                padding: EdgeInsets.only(left: 25.0, right: 25.0, top: 25.0),
+                child: new Row(
+                  mainAxisSize: MainAxisSize.max,
+                  children: <Widget>[
+                    new Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        new Text(
                           'Locate on Map',
                           style: TextStyle(
                               fontSize: 16.0, fontWeight: FontWeight.bold),
