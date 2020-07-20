@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import '../../../../services/eventservice/updateform.dart';
+import '../../../services/eventservice/updateform.dart';
 
 class LiveeventsPage extends StatefulWidget {
   final String title;
