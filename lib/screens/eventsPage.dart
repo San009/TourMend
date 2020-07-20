@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../widgets/mainPageWidgets/eventsWidgets/formWidget/Reportevent.dart';
+import '../widgets/eventsWidgets/formWidget/Reportevent.dart';
 
 /// This Widget is the main application widget.
 class EventPage extends StatelessWidget {
