@@ -62,6 +62,7 @@ if (isset($_POST['username'], $_POST['email'], $_POST['password'])) {
             echo (json_encode(array('statusCode' => '3', 'message' => 'Email address is wrong!')));
         }
     }
-
+    // mysqli_free_result($checkEmail);
     mysqli_close($db_conn);
 } else echo (json_encode(array('statusCode' => '4', 'message' => 'Error in method!')));
+return;

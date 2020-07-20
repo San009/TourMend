@@ -1,10 +1,10 @@
-import 'forgotPasswordWidgets/emailPage.dart';
+import '../widgets/forgotPasswordWidgets/emailPage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/loginSignup.dart';
 import 'signUpPage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'mainPage.dart';
+import '../widgets/mainPageWidgets/mainPage.dart';
 import 'package:email_validator/email_validator.dart';
 
 class LoginPage extends StatefulWidget {
@@ -150,7 +150,7 @@ class _LoginPageState extends State<LoginPage> {
   void _logIn() async {
     if (_formKey.currentState.validate()) {
       LoginSignup.login(_email.text, _password.text).then((result) {
-        print(result);
+        // print(result);
         if (result == '1') {
           _loginData.setBool('login', false);
           _loginData.setString('user_email', _email.text);

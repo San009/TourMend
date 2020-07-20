@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'modal/places.dart';
+import '../../modals/places.dart';
 
 class JsonListView extends StatelessWidget {
   final AsyncSnapshot snapshot;

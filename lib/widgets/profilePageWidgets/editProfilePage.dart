@@ -1,23 +1,23 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:http/http.dart' as http;
-import '../../services/editinfo.dart';
+import '../../services/editInfo.dart';
 import 'package:email_validator/email_validator.dart';
 
-class ProfilePage extends StatefulWidget {
-  final String title;
+class EditProfilePage extends StatefulWidget {
+  final String title, userName, email;
 
-  ProfilePage({Key key, this.title}) : super(key: key);
+  EditProfilePage({Key key, this.title, this.userName, this.email})
+      : super(key: key);
   @override
-  MapScreenState createState() => MapScreenState();
+  EditProfilePageState createState() => EditProfilePageState();
 }
 
-class MapScreenState extends State<ProfilePage>
+class EditProfilePageState extends State<EditProfilePage>
     with SingleTickerProviderStateMixin {
-  bool _status = true;
+  bool _editStatus = true;
   final picker = ImagePicker();
   File _image;
   GlobalKey<ScaffoldState> _scaffoldKey;
@@ -28,7 +28,6 @@ class MapScreenState extends State<ProfilePage>
   TextEditingController _username;
   TextEditingController _email;
   TextEditingController _password;
-  // TextEditingController _contact;
 
   @override
   void initState() {
@@ -38,105 +37,21 @@ class MapScreenState extends State<ProfilePage>
     _username = TextEditingController();
     _email = TextEditingController();
     _password = TextEditingController();
-    //_contact = TextEditingController();
   }
-
-  void _clearValues() {
-    _username.text = '';
-    _email.text = '';
-    _password.text = '';
-    //  _contact.text = '';
-  }
-
-  // ignore: unused_element
-  void _showSnackBar(context, message) {
-    _scaffoldKey.currentState.showSnackBar(
-      SnackBar(
-        content: Text(message),
-      ),
-    );
-  }
-
-  updatefield() async {
-    Editinfo.edit(
-      _username.text,
-      _email.text,
-      _password.text,
-    ).then((result) {
-      print(result);
-      if (result == '1') {
-        _clearValues();
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: new Text(
-                  'Update successfully!\n Please Login in again to see update'),
-              actions: <Widget>[
-                FlatButton(
-                  child: new Text("OK"),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ],
-            );
-          },
-        );
-      } else if (result == '0') {
-        _clearValues();
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: new Text('Incorrect  password.\nPlease try again!'),
-              actions: <Widget>[
-                FlatButton(
-                  child: new Text("OK"),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ],
-            );
-          },
-        );
-      } else {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: new Text('This email already has an account!'),
-              actions: <Widget>[
-                FlatButton(
-                  child: new Text("OK"),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ],
-            );
-          },
-        );
-      }
-    });
-  }
-
-// ignore: unused_element
 
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
-        body: new Container(
+    return Scaffold(
+        body: Container(
       color: Colors.white,
-      child: new ListView(
+      child: ListView(
         children: <Widget>[
           Column(
             children: <Widget>[
-              new Container(
+              Container(
                 height: 250.0,
                 color: Colors.white,
-                child: new Column(
+                child: Column(
                   children: <Widget>[
                     Padding(
                         padding: EdgeInsets.only(left: 20.0, top: 20.0),
@@ -166,13 +81,13 @@ class MapScreenState extends State<ProfilePage>
                         )),
                     Padding(
                       padding: EdgeInsets.only(top: 20.0),
-                      child: new Stack(fit: StackFit.loose, children: <Widget>[
+                      child: Stack(fit: StackFit.loose, children: <Widget>[
                         Align(
                           alignment: Alignment.center,
                           child: CircleAvatar(
                             radius: 90,
                             child: ClipOval(
-                              child: new SizedBox(
+                              child: SizedBox(
                                 width: 180.0,
                                 height: 180.0,
                                 child: (_image != null)
@@ -190,10 +105,10 @@ class MapScreenState extends State<ProfilePage>
                         ),
                         Padding(
                             padding: EdgeInsets.only(top: 110.0, left: 140.0),
-                            child: new Row(
+                            child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
-                                new CircleAvatar(
+                                CircleAvatar(
                                     backgroundColor: Colors.red,
                                     radius: 25.0,
                                     child: IconButton(
@@ -221,6 +136,87 @@ class MapScreenState extends State<ProfilePage>
     ));
   }
 
+  void _clearValues() {
+    _username.text = '';
+    _email.text = '';
+    _password.text = '';
+  }
+
+  // ignore: unused_element
+  void _showSnackBar(context, message) {
+    _scaffoldKey.currentState.showSnackBar(
+      SnackBar(
+        content: Text(message),
+      ),
+    );
+  }
+
+  void _updatefield() async {
+    EditInfo.edit(
+      _username.text,
+      widget.email,
+      _email.text,
+      _password.text,
+    ).then((result) {
+      print(result);
+      if (result == '1') {
+        _clearValues();
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text(
+                  'Update successfully!\n Please Login in again to see update'),
+              actions: <Widget>[
+                FlatButton(
+                  child: Text("OK"),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      } else if (result == '3') {
+        _clearValues();
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Incorrect  password.\nPlease try again!'),
+              actions: <Widget>[
+                FlatButton(
+                  child: Text("OK"),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      } else {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('This email already has an account!'),
+              actions: <Widget>[
+                FlatButton(
+                  child: Text("OK"),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      }
+    });
+  }
+
   Form textSection() {
     return Form(
         key: _formKey,
@@ -228,33 +224,33 @@ class MapScreenState extends State<ProfilePage>
           color: Color(0xffFFFFFF),
           child: Padding(
             padding: EdgeInsets.only(bottom: 25.0),
-            child: new Column(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
                 Padding(
                     padding:
                         EdgeInsets.only(left: 25.0, right: 25.0, top: 25.0),
-                    child: new Row(
+                    child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       mainAxisSize: MainAxisSize.max,
                       children: <Widget>[
-                        new Column(
+                        Column(
                           mainAxisAlignment: MainAxisAlignment.start,
                           mainAxisSize: MainAxisSize.min,
                           children: <Widget>[
-                            new Text(
+                            Text(
                               'Parsonal Information',
                               style: TextStyle(
                                   fontSize: 18.0, fontWeight: FontWeight.bold),
                             ),
                           ],
                         ),
-                        new Column(
+                        Column(
                           mainAxisAlignment: MainAxisAlignment.end,
                           mainAxisSize: MainAxisSize.min,
                           children: <Widget>[
-                            _status ? _getEditIcon() : new Container(),
+                            _editStatus ? _getEditIcon() : Container(),
                           ],
                         )
                       ],
@@ -262,14 +258,14 @@ class MapScreenState extends State<ProfilePage>
                 Padding(
                     padding:
                         EdgeInsets.only(left: 25.0, right: 25.0, top: 25.0),
-                    child: new Row(
+                    child: Row(
                       mainAxisSize: MainAxisSize.max,
                       children: <Widget>[
-                        new Column(
+                        Column(
                           mainAxisAlignment: MainAxisAlignment.start,
                           mainAxisSize: MainAxisSize.min,
                           children: <Widget>[
-                            new Text(
+                            Text(
                               'Name',
                               style: TextStyle(
                                   fontSize: 16.0, fontWeight: FontWeight.bold),
@@ -280,19 +276,19 @@ class MapScreenState extends State<ProfilePage>
                     )),
                 Padding(
                     padding: EdgeInsets.only(left: 25.0, right: 25.0, top: 2.0),
-                    child: new Row(
+                    child: Row(
                       mainAxisSize: MainAxisSize.max,
                       children: <Widget>[
-                        new Flexible(
-                          child: new TextFormField(
+                        Flexible(
+                          child: TextFormField(
                             controller: _username,
                             decoration: const InputDecoration(
                               hintText: "Enter Your Name",
                             ),
                             validator: (value) =>
                                 value.isEmpty ? 'Username is required!' : null,
-                            enabled: !_status,
-                            autofocus: !_status,
+                            enabled: !_editStatus,
+                            autofocus: !_editStatus,
                           ),
                         ),
                       ],
@@ -300,14 +296,14 @@ class MapScreenState extends State<ProfilePage>
                 Padding(
                     padding:
                         EdgeInsets.only(left: 25.0, right: 25.0, top: 25.0),
-                    child: new Row(
+                    child: Row(
                       mainAxisSize: MainAxisSize.max,
                       children: <Widget>[
-                        new Column(
+                        Column(
                           mainAxisAlignment: MainAxisAlignment.start,
                           mainAxisSize: MainAxisSize.min,
                           children: <Widget>[
-                            new Text(
+                            Text(
                               'Email ID',
                               style: TextStyle(
                                   fontSize: 16.0, fontWeight: FontWeight.bold),
@@ -318,15 +314,15 @@ class MapScreenState extends State<ProfilePage>
                     )),
                 Padding(
                     padding: EdgeInsets.only(left: 25.0, right: 25.0, top: 2.0),
-                    child: new Row(
+                    child: Row(
                       mainAxisSize: MainAxisSize.max,
                       children: <Widget>[
-                        new Flexible(
-                          child: new TextFormField(
+                        Flexible(
+                          child: TextFormField(
                             controller: _email,
                             decoration: const InputDecoration(
                                 hintText: "Enter Email ID"),
-                            enabled: !_status,
+                            enabled: !_editStatus,
                             validator: (val) {
                               if (val.isEmpty) {
                                 return 'Email is required!';
@@ -343,15 +339,15 @@ class MapScreenState extends State<ProfilePage>
                 Padding(
                     padding:
                         EdgeInsets.only(left: 25.0, right: 25.0, top: 25.0),
-                    child: new Row(
+                    child: Row(
                       mainAxisSize: MainAxisSize.max,
                       children: <Widget>[
-                        new Column(
+                        Column(
                           mainAxisAlignment: MainAxisAlignment.start,
                           mainAxisSize: MainAxisSize.min,
                           children: <Widget>[
-                            new Text(
-                              'Enter Your Password for Update',
+                            Text(
+                              'Enter current password to update',
                               style: TextStyle(
                                   fontSize: 16.0, fontWeight: FontWeight.bold),
                             ),
@@ -361,15 +357,15 @@ class MapScreenState extends State<ProfilePage>
                     )),
                 Padding(
                     padding: EdgeInsets.only(left: 25.0, right: 25.0, top: 2.0),
-                    child: new Row(
+                    child: Row(
                       mainAxisSize: MainAxisSize.max,
                       children: <Widget>[
-                        new Flexible(
-                          child: new TextFormField(
+                        Flexible(
+                          child: TextFormField(
                             controller: _password,
                             decoration:
                                 const InputDecoration(hintText: "Enter "),
-                            enabled: !_status,
+                            enabled: !_editStatus,
                             validator: (val) => val.length < 6
                                 ? 'Password must be atleast 6 characters long!'
                                 : null,
@@ -377,7 +373,7 @@ class MapScreenState extends State<ProfilePage>
                         ),
                       ],
                     )),
-                !_status ? _getActionButtons() : new Container(),
+                !_editStatus ? _getActionButtons() : Container(),
               ],
             ),
           ),
@@ -418,7 +414,7 @@ class MapScreenState extends State<ProfilePage>
   Widget _getActionButtons() {
     return Padding(
       padding: EdgeInsets.only(left: 25.0, right: 25.0, top: 45.0),
-      child: new Row(
+      child: Row(
         mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
@@ -426,23 +422,23 @@ class MapScreenState extends State<ProfilePage>
             child: Padding(
               padding: EdgeInsets.only(right: 10.0),
               child: Container(
-                  child: new RaisedButton(
-                child: new Text("Save"),
+                  child: RaisedButton(
+                child: Text("Save"),
                 textColor: Colors.white,
-                color: Colors.green,
+                color: Colors.blue,
                 onPressed: () {
                   setState(() {
                     if (_formKey.currentState.validate()) {
-                      updatefield();
+                      _updatefield();
                       //_upload();
-                      _status = true;
+                      _editStatus = true;
                     }
 
-                    FocusScope.of(context).requestFocus(new FocusNode());
+                    FocusScope.of(context).requestFocus(FocusNode());
                   });
                 },
-                shape: new RoundedRectangleBorder(
-                    borderRadius: new BorderRadius.circular(20.0)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20.0)),
               )),
             ),
             flex: 2,
@@ -451,18 +447,18 @@ class MapScreenState extends State<ProfilePage>
             child: Padding(
               padding: EdgeInsets.only(left: 10.0),
               child: Container(
-                  child: new RaisedButton(
-                child: new Text("Cancel"),
+                  child: RaisedButton(
+                child: Text("Cancel"),
                 textColor: Colors.white,
                 color: Colors.red,
                 onPressed: () {
                   setState(() {
-                    _status = true;
-                    FocusScope.of(context).requestFocus(new FocusNode());
+                    _editStatus = true;
+                    FocusScope.of(context).requestFocus(FocusNode());
                   });
                 },
-                shape: new RoundedRectangleBorder(
-                    borderRadius: new BorderRadius.circular(20.0)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20.0)),
               )),
             ),
             flex: 2,
@@ -475,7 +471,7 @@ class MapScreenState extends State<ProfilePage>
   Widget _getuploadButtons() {
     return Padding(
       padding: EdgeInsets.only(left: 120.0, right: 120.0, top: 45.0),
-      child: new Row(
+      child: Row(
         mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
@@ -483,15 +479,15 @@ class MapScreenState extends State<ProfilePage>
             child: Padding(
               padding: EdgeInsets.only(right: 10.0),
               child: Container(
-                  child: new RaisedButton(
-                child: new Text("Upload profile pic"),
+                  child: RaisedButton(
+                child: Text("Upload profile pic"),
                 textColor: Colors.white,
                 color: Colors.green,
                 onPressed: () {
                   _upload();
                 },
-                shape: new RoundedRectangleBorder(
-                    borderRadius: new BorderRadius.circular(20.0)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20.0)),
               )),
             ),
             flex: 2,
@@ -502,11 +498,11 @@ class MapScreenState extends State<ProfilePage>
   }
 
   Widget _getEditIcon() {
-    return new GestureDetector(
-      child: new CircleAvatar(
+    return GestureDetector(
+      child: CircleAvatar(
         backgroundColor: Colors.red,
         radius: 14.0,
-        child: new Icon(
+        child: Icon(
           Icons.edit,
           color: Colors.white,
           size: 16.0,
@@ -514,7 +510,7 @@ class MapScreenState extends State<ProfilePage>
       ),
       onTap: () {
         setState(() {
-          _status = false;
+          _editStatus = !_editStatus;
         });
       },
     );

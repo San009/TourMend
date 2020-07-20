@@ -5,7 +5,7 @@ if (isset($_GET['page_number'])) {
     require_once 'db_config.php';
 
     $page_number = $_GET['page_number'];
-    $item_count = 4;
+    $item_count = 3;
     // array for the final response
     $response = array();
 
@@ -16,7 +16,7 @@ if (isset($_GET['page_number'])) {
     $result = mysqli_query($db_conn, $sql);
 
     if ($result) {
-        if (mysqli_num_rows($result) <= 4 && mysqli_num_rows($result) != 0) {
+        if (mysqli_num_rows($result) <= 3 && mysqli_num_rows($result) != 0) {
             $response['statusCode'] = '1';
             $response['message'] = 'Data fetched successfully!';
             $rowArray =  array();

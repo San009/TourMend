@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import '../../../../services/eventservice/updateform.dart';
 
 class LiveeventsPage extends StatefulWidget {
   final String title;
@@ -28,12 +29,21 @@ class Company {
 
 class MapScreenState extends State<LiveeventsPage>
     with SingleTickerProviderStateMixin {
+  GlobalKey<ScaffoldState> _scaffoldKey;
+  TextEditingController _address;
+  TextEditingController _description;
+
+  GlobalKey<FormState> _formKey;
   List<Company> _companies = Company.getCompanies();
   List<DropdownMenuItem<Company>> _dropdownMenuItems;
   Company _selectedCompany;
 
   @override
   void initState() {
+    _address = TextEditingController();
+    _description = TextEditingController();
+
+    _formKey = GlobalKey<FormState>();
     _dropdownMenuItems = buildDropdownMenuItems(_companies);
     _selectedCompany = _dropdownMenuItems[0].value;
     super.initState();
@@ -55,6 +65,77 @@ class MapScreenState extends State<LiveeventsPage>
   onChangeDropdownItem(Company selectedCompany) {
     setState(() {
       _selectedCompany = selectedCompany;
+    });
+  }
+
+  void _clearValues() {
+    _address.text = '';
+    _description.text = '';
+
+    //  _contact.text = '';
+  }
+
+  updatefield() async {
+    Liveevent.live(
+      _address.text,
+      _description.text,
+    ).then((result) {
+      print(result);
+      if (result == '1') {
+        _clearValues();
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: new Text('Pending Approbal\n we will notify'),
+              actions: <Widget>[
+                FlatButton(
+                  child: new Text("OK"),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+        // ignore: unnecessary_statements
+      } else if (result == '0') {
+        _clearValues();
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: new Text('Incorrect  password.\nPlease try again!'),
+              actions: <Widget>[
+                FlatButton(
+                  child: new Text("OK"),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      } else {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: new Text('This email already has an account!'),
+              actions: <Widget>[
+                FlatButton(
+                  child: new Text("OK"),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      }
     });
   }
 
@@ -162,6 +243,7 @@ class MapScreenState extends State<LiveeventsPage>
                   children: <Widget>[
                     new Flexible(
                       child: TextField(
+                        controller: _address,
                         decoration: new InputDecoration(
                           contentPadding: const EdgeInsets.symmetric(
                               vertical: 5.0, horizontal: 5),
@@ -243,6 +325,7 @@ class MapScreenState extends State<LiveeventsPage>
                   children: <Widget>[
                     new Flexible(
                         child: new TextField(
+                      controller: _description,
                       textInputAction: TextInputAction.newline,
                       keyboardType: TextInputType.multiline,
                       maxLines: 10,
@@ -269,46 +352,48 @@ class MapScreenState extends State<LiveeventsPage>
       ),
     ));
   }
-}
 
-Widget _getActionButtons() {
-  return Padding(
-    padding: EdgeInsets.only(left: 25.0, right: 25.0, top: 45.0),
-    child: new Row(
-      mainAxisSize: MainAxisSize.max,
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: <Widget>[
-        Expanded(
-          child: Padding(
-            padding: EdgeInsets.only(right: 10.0),
-            child: Container(
-                child: new RaisedButton(
-              child: new Text("Save"),
-              textColor: Colors.white,
-              color: Colors.blue,
-              onPressed: () {},
-              shape: new RoundedRectangleBorder(
-                  borderRadius: new BorderRadius.circular(20.0)),
-            )),
+  Widget _getActionButtons() {
+    return Padding(
+      padding: EdgeInsets.only(left: 25.0, right: 25.0, top: 45.0),
+      child: new Row(
+        mainAxisSize: MainAxisSize.max,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: <Widget>[
+          Expanded(
+            child: Padding(
+              padding: EdgeInsets.only(right: 10.0),
+              child: Container(
+                  child: new RaisedButton(
+                child: new Text("Save"),
+                textColor: Colors.white,
+                color: Colors.blue,
+                onPressed: () {
+                  updatefield();
+                },
+                shape: new RoundedRectangleBorder(
+                    borderRadius: new BorderRadius.circular(20.0)),
+              )),
+            ),
+            flex: 2,
           ),
-          flex: 2,
-        ),
-        Expanded(
-          child: Padding(
-            padding: EdgeInsets.only(left: 10.0),
-            child: Container(
-                child: new RaisedButton(
-              child: new Text("Cancel"),
-              textColor: Colors.white,
-              color: Colors.red,
-              onPressed: () {},
-              shape: new RoundedRectangleBorder(
-                  borderRadius: new BorderRadius.circular(20.0)),
-            )),
+          Expanded(
+            child: Padding(
+              padding: EdgeInsets.only(left: 10.0),
+              child: Container(
+                  child: new RaisedButton(
+                child: new Text("Cancel"),
+                textColor: Colors.white,
+                color: Colors.red,
+                onPressed: () {},
+                shape: new RoundedRectangleBorder(
+                    borderRadius: new BorderRadius.circular(20.0)),
+              )),
+            ),
+            flex: 2,
           ),
-          flex: 2,
-        ),
-      ],
-    ),
-  );
+        ],
+      ),
+    );
+  }
 }

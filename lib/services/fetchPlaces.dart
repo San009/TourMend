@@ -1,8 +1,6 @@
 import 'dart:convert';
-//import 'package:flutter/src/widgets/editable_text.dart';
-
-import '../widgets/mainPageWidgets/placesWidgets/modal/placesList.dart';
-import '../widgets/mainPageWidgets/placesWidgets/modal/places.dart';
+import '../modals/placesList.dart';
+import '../modals/places.dart';
 import 'package:http/http.dart' as http;
 
 class FetchPlaces {
@@ -61,7 +59,7 @@ class FetchPlaces {
 
     try {
       var response = await http.get(Uri.encodeFull(
-          "http://10.0.2.2/TourMendWebServices/searchlist.php?keyword=" +
+          "http://10.0.2.2/TourMendWebServices/searchList.php?keyword=" +
               _search.toString() +
               "&page_number=" +
               pageNumber.toString()));

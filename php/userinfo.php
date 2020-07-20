@@ -1,32 +1,25 @@
 <?php
- 	include('db_config.php');
+if (isset($_GET['email'])) {
+    require_once 'db_config.php';
 
- $response=array();
-// $id=$_GET['userId'];
-$email=$_GET['email'];
- 
-  $sql = "SELECT 
-    email,username FROM user_info where email='$email' ";
-if($result=mysqli_query($db_conn,$sql))
-{
-$response['error']=false;
+    $email = $_GET['email'];
 
-$row= mysqli_num_rows($result);
+    $sql = "SELECT username FROM user_info where email='$email'";
+    if ($result = mysqli_query($db_conn, $sql)) {
+        $row = mysqli_num_rows($result);
 
-if ($row>0) {
-	
- while($row= mysqli_fetch_assoc($result))
-{
-	$output[]=$row;	
+        if ($row == 1) {
+
+            while ($row = mysqli_fetch_assoc($result)) {
+                $output[] = $row;
+            }
+            echo (json_encode(array("statusCode" => '1', "username" => $output[0]['username'], "message" => 'Data found!')));
+        } else {
+            echo (json_encode(array("statusCode" => '0', "message" => "Data not found!")));
+        }
+    }
+
+    mysqli_close($db_conn);
+} else {
+    echo (json_encode(array("statusCode" => '3', "message" => "Error in method!")));
 }
-echo ($result) ? 
-json_encode(array( "code" => 1,"result"=>$output)) :
-json_encode(array("code" => 0,"message"=>"Data not found !"));
-
-}
-
-}
-
- mysqli_close($db_conn);
-
- ?>

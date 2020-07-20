@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../loginPage.dart';
+import '../../screens/loginPage.dart';
 import '../../services/forgotPass.dart';
 import 'emailOTP.dart';
 

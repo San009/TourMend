@@ -29,12 +29,24 @@ class _ForgotPasswordState extends State<EmailPage> {
       key: _scaffoldKey,
       body: _isLoading
           ? Center(
-              child: SizedBox(
-                height: 200.0,
-                width: 200.0,
-                child: CircularProgressIndicator(
-                  strokeWidth: 5.0,
-                ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 20.0),
+                    child: SizedBox(
+                      height: 100.0,
+                      width: 100.0,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 5.0,
+                      ),
+                    ),
+                  ),
+                  Text(
+                    'Sending mail...',
+                    style: TextStyle(fontSize: 15.0),
+                  )
+                ],
               ),
             )
           : SingleChildScrollView(

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'nestedTabBar.dart';
-import '../../../services/fetchPlaces.dart';
-import 'modal/places.dart';
+import '../../services/fetchPlaces.dart';
+import '../../modals/places.dart';
 
 class SearchPage extends StatefulWidget {
   final String tvalue;
@@ -40,7 +40,7 @@ class _SearchPageState extends State<SearchPage> {
             return AlertDialog(
               title: Row(children: [
                 Image.network(
-                  'http://10.0.2.2/TourMendWebServices/placeimage/noresult.png',
+                  'http://10.0.2.2/TourMendWebServices/PlacesImage/noresult.png',
                   width: 100,
                   height: 100,
                   fit: BoxFit.contain,

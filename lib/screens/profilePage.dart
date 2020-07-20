@@ -1,45 +1,26 @@
 import 'package:flutter/material.dart';
-import 'component/editprofile.dart';
-import 'package:http/http.dart' as http;
-import 'dart:async';
-import 'dart:convert';
+import 'package:flutter_app/services/getUserInfo.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../widgets/profilePageWidgets/editProfilePage.dart';
 
-class Profile extends StatefulWidget {
-  var userEmail;
-  Profile({Key key, this.userEmail}) : super(key: key);
+class ProfilePage extends StatefulWidget {
+  final String title;
+  ProfilePage({Key key, this.title}) : super(key: key);
   @override
-  _ProfileState createState() => new _ProfileState();
+  _ProfilePageState createState() => new _ProfilePageState();
 }
 
-class _ProfileState extends State<Profile> {
-  List data;
-
-  var _isLoading = false;
-  String username = "username ", email = "email ";
-
-  Future<String> getLogin(String id) async {
-    var response = await http.get(Uri.encodeFull(
-        "http://10.0.2.2/TourMendWebServices/userinfo.php?email=" +
-            id.toString()));
-
-    setState(() {
-      _isLoading = true;
-      var convertDataToJson = json.decode(response.body);
-      data = convertDataToJson['result'];
-      if (data != null) {
-        username = data[0]['username'];
-        email = data[0]['email'];
-      }
-    });
-    print(data);
-  }
+class _ProfilePageState extends State<ProfilePage> {
+  // bool _isLoading = false;
+  String userName, email;
+  SharedPreferences currentEmail;
 
   @override
   void initState() {
     super.initState();
-    setState(() {
-      getLogin(widget.userEmail);
-    });
+    userName = '';
+    email = '';
+    _getUserInfo();
   }
 
   @override
@@ -87,7 +68,7 @@ class _ProfileState extends State<Profile> {
                             'Name',
                             style: TextStyle(fontSize: 20),
                           ),
-                          subtitle: Text(username),
+                          subtitle: Text(userName),
                         ),
                         ListTile(
                           leading: Icon(
@@ -119,7 +100,11 @@ class _ProfileState extends State<Profile> {
           Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (context) => ProfilePage(),
+                builder: (context) => EditProfilePage(
+                  title: 'Edit Profile',
+                  userName: userName,
+                  email: email,
+                ),
               ));
         },
         label: Text('Edit'),
@@ -127,6 +112,21 @@ class _ProfileState extends State<Profile> {
         backgroundColor: Colors.blue,
       ),
     );
+  }
+
+  void _getUserInfo() async {
+    currentEmail = await SharedPreferences.getInstance();
+    setState(() {
+      email = currentEmail.getString('user_email');
+    });
+
+    GetUserInfo.getUserInfo(email).then((result) {
+      if (result != null) {
+        setState(() {
+          userName = result;
+        });
+      }
+    });
   }
 }
 
@@ -143,7 +143,6 @@ class GetClipper extends CustomClipper<Path> {
 
   @override
   bool shouldReclip(CustomClipper<Path> oldClipper) {
-    // TODO: implement shouldReclip
     return true;
   }
 }

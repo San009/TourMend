@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'formWidget/Reportevent.dart';
+import '../widgets/mainPageWidgets/eventsWidgets/formWidget/Reportevent.dart';
 
 /// This Widget is the main application widget.
 class EventPage extends StatelessWidget {
@@ -116,7 +116,7 @@ class EventPage extends StatelessWidget {
                 Padding(
                   padding: EdgeInsets.only(bottom: 10.0),
                   child: Image.network(
-                    'http://10.0.2.2/TourMendWebServices/placeimage/eventsbanner.jpg',
+                    'http://10.0.2.2/TourMendWebServices/placesimage/eventsbanner.jpg',
                     fit: BoxFit.cover,
                   ),
                 ),

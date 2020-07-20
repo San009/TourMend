@@ -4,7 +4,7 @@ import 'package:location/location.dart';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../loginPage.dart';
+import 'loginPage.dart';
 import 'customDialogBox.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
@@ -182,8 +182,11 @@ class _HomePageState extends State<HomePage> {
             actions: <Widget>[
               InkWell(
                 onTap: () => Navigator.of(context).pop(false),
-                child:
-                    Text("Cancel", style: TextStyle(color: Colors.blueAccent)),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(5.0, 8.0, 5.0, 8.0),
+                  child: Text("Cancel",
+                      style: TextStyle(color: Colors.blueAccent)),
+                ),
               ),
               SizedBox(height: 16),
               InkWell(
@@ -198,8 +201,11 @@ class _HomePageState extends State<HomePage> {
                     (route) => false,
                   );
                 },
-                child:
-                    Text("Logout", style: TextStyle(color: Colors.redAccent)),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(5.0, 8.0, 5.0, 8.0),
+                  child:
+                      Text("Logout", style: TextStyle(color: Colors.redAccent)),
+                ),
               ),
             ],
           ),
