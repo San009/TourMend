@@ -5,6 +5,7 @@ import 'package:flutter_app/widgets/mainPageWidgets/homePageWidgets/homePage.dar
 import 'package:shared_preferences/shared_preferences.dart';
 import 'mainPageWidgets/homePageWidgets/homePage.dart';
 import 'mainPageWidgets/placesWidgets/placesPage.dart';
+import 'mainPageWidgets/eventsWidgets/eventsPage.dart';
 
 class MainPage extends StatefulWidget {
   MainPage({Key key, this.title}) : super(key: key);
@@ -27,10 +28,7 @@ class _MainPageState extends State<MainPage> {
     PlacesPage(
       title: 'Places',
     ),
-    Text(
-      'Index 3: Events',
-      style: optionStyle,
-    ),
+    EventPage(),
     Text(
       'Index 4: News',
       style: optionStyle,
