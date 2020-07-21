@@ -7,8 +7,9 @@ if (isset($_POST['eventaddress'], $_POST['description'])) {
 
     $eventaddress = $_POST['eventaddress'];
     $description = $_POST['description'];
+    $eventType =$_POST['eventType'];
       
-            $sql = "INSERT INTO tbl_events (eventaddress, description) VALUES ('$eventaddress', '$description')";
+            $sql = "INSERT INTO tbl_events (eventaddress, eventType,description) VALUES ('$eventaddress','$eventType','$description')";
 
             $executeQurey = mysqli_query($db_conn, $sql);
 

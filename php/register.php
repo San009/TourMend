@@ -12,18 +12,19 @@ if (isset($_POST['username'], $_POST['email'], $_POST['password'])) {
     $checkEmail = "SELECT * FROM user_info WHERE email='$email'";
 
     $checkresultEmail = mysqli_query($db_conn, $checkEmail);
-
+    echo "";
     //check if email already exists	
     if (mysqli_num_rows($checkresultEmail) > 0) {
         echo (json_encode(array('statusCode' => '2', 'message' => 'This email address already has an account')));
         return;
     } else {
+        echo "";
         require_once "PHPMailer/PHPMailer.php";
         require_once "PHPMailer/SMTP.php";
         require_once "PHPMailer/Exception.php";
-
+          
         $activationMail = new PHPMailer(true);
-
+      
         //SMTP settings
         $activationMail->isSMTP();
         $activationMail->Host = "smtp.gmail.com";
@@ -45,8 +46,9 @@ if (isset($_POST['username'], $_POST['email'], $_POST['password'])) {
         $activationMail->Subject = $subject;
         $activationMail->Body = $body;
 
-
+       
         if ($activationMail->send()) {
+            echo "here";
             $hashedPassword = sha1($password);
             $status = "inactive";
             $sql = "INSERT INTO user_info (username, email, password, reset_code, status) VALUES ('$username', '$email', '$hashedPassword', '', '$status')";
@@ -63,6 +65,6 @@ if (isset($_POST['username'], $_POST['email'], $_POST['password'])) {
         }
     }
     // mysqli_free_result($checkEmail);
-    mysqli_close($db_conn);
+   mysqli_close($db_conn);
 } else echo (json_encode(array('statusCode' => '4', 'message' => 'Error in method!')));
 return;
