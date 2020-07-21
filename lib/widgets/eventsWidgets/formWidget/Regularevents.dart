@@ -161,9 +161,10 @@ class MapScreenState extends State<RegulareventsPage>
                           width: 1,
                         ),
                       ),
-                      child: Center(
-                          child: Text("Map Comming Soon....",
-                              style: TextStyle(fontSize: 20))),
+                      child: Image.network(
+                        'http://10.0.2.2/TourMendWebServices/placesimage/coming.jpg',
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ],
                 )),

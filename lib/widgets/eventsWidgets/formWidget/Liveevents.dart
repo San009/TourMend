@@ -10,19 +10,19 @@ class LiveeventsPage extends StatefulWidget {
   MapScreenState createState() => MapScreenState();
 }
 
-class Company {
+class Events {
   int id;
   String name;
 
-  Company(this.id, this.name);
+  Events(this.id, this.name);
 
-  static List<Company> getCompanies() {
-    return <Company>[
-      Company(1, 'Event:1'),
-      Company(2, 'Event:2'),
-      Company(3, 'Event:3'),
-      Company(4, 'Event:4'),
-      Company(5, 'Event:5'),
+  static List<Events> getCompanies() {
+    return <Events>[
+      Events(1, 'Landslide'),
+      Events(2, 'Under construction'),
+      Events(3, 'Flood'),
+      Events(4, 'Traffic Jam'),
+      Events(5, 'VIP escorting'),
     ];
   }
 }
@@ -34,9 +34,9 @@ class MapScreenState extends State<LiveeventsPage>
   TextEditingController _description;
 
   GlobalKey<FormState> _formKey;
-  List<Company> _companies = Company.getCompanies();
-  List<DropdownMenuItem<Company>> _dropdownMenuItems;
-  Company _selectedCompany;
+  List<Events> _events = Events.getCompanies();
+  List<DropdownMenuItem<Events>> _dropdownMenuItems;
+  Events _selectedEvent;
 
   @override
   void initState() {
@@ -44,14 +44,14 @@ class MapScreenState extends State<LiveeventsPage>
     _description = TextEditingController();
 
     _formKey = GlobalKey<FormState>();
-    _dropdownMenuItems = buildDropdownMenuItems(_companies);
-    _selectedCompany = _dropdownMenuItems[0].value;
+    _dropdownMenuItems = buildDropdownMenuItems(_events);
+    _selectedEvent = _dropdownMenuItems[0].value;
     super.initState();
   }
 
-  List<DropdownMenuItem<Company>> buildDropdownMenuItems(List companies) {
-    List<DropdownMenuItem<Company>> items = List();
-    for (Company company in companies) {
+  List<DropdownMenuItem<Events>> buildDropdownMenuItems(List companies) {
+    List<DropdownMenuItem<Events>> items = List();
+    for (Events company in companies) {
       items.add(
         DropdownMenuItem(
           value: company,
@@ -62,9 +62,9 @@ class MapScreenState extends State<LiveeventsPage>
     return items;
   }
 
-  onChangeDropdownItem(Company selectedCompany) {
+  onChangeDropdownItem(Events selectedCompany) {
     setState(() {
-      _selectedCompany = selectedCompany;
+      _selectedEvent = selectedCompany;
     });
   }
 
@@ -79,6 +79,7 @@ class MapScreenState extends State<LiveeventsPage>
     Liveevent.live(
       _address.text,
       _description.text,
+      _selectedEvent.name,
     ).then((result) {
       print(result);
       if (result == '1') {
@@ -158,199 +159,209 @@ class MapScreenState extends State<LiveeventsPage>
 
   Form textSection() {
     return Form(
+        key: _formKey,
         child: Container(
-      color: Color(0xffFFFFFF),
-      child: Padding(
-        padding: EdgeInsets.only(bottom: 25.0),
-        child: new Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: <Widget>[
-            Padding(
-                padding: EdgeInsets.only(left: 25.0, right: 25.0, top: 25.0),
-                child: new Row(
-                  mainAxisSize: MainAxisSize.max,
-                  children: <Widget>[
-                    new Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
+          color: Color(0xffFFFFFF),
+          child: Padding(
+            padding: EdgeInsets.only(bottom: 25.0),
+            child: new Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: <Widget>[
+                Padding(
+                    padding:
+                        EdgeInsets.only(left: 25.0, right: 25.0, top: 25.0),
+                    child: new Row(
+                      mainAxisSize: MainAxisSize.max,
                       children: <Widget>[
-                        new Text(
-                          'Live events Type',
-                          style: TextStyle(
-                              fontSize: 16.0, fontWeight: FontWeight.bold),
-                        ),
-                      ],
-                    ),
-                  ],
-                )),
-            Padding(
-                padding: EdgeInsets.only(left: 25.0, right: 25.0, top: 9.0),
-                child: new Row(
-                  mainAxisSize: MainAxisSize.max,
-                  children: <Widget>[
-                    new Container(
-                      height: 35,
-                      width: 325,
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: Colors.black,
-                          width: 1,
-                        ),
-                      ),
-                      child: Center(
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.center,
+                        new Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
                           children: <Widget>[
-                            DropdownButton(
-                              value: _selectedCompany,
-                              items: _dropdownMenuItems,
-                              onChanged: onChangeDropdownItem,
+                            new Text(
+                              'Live events Type',
+                              style: TextStyle(
+                                  fontSize: 16.0, fontWeight: FontWeight.bold),
                             ),
-                            SizedBox(
-                              height: 20.0,
-                            ),
-                            Text('Selected: ${_selectedCompany.name}'),
                           ],
                         ),
-                      ),
-                    ),
-                  ],
-                )),
-            Padding(
-                padding: EdgeInsets.only(left: 25.0, right: 25.0, top: 25.0),
-                child: new Row(
-                  mainAxisSize: MainAxisSize.max,
-                  children: <Widget>[
-                    new Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        new Text(
-                          'Event Address',
-                          style: TextStyle(
-                              fontSize: 16.0, fontWeight: FontWeight.bold),
-                        ),
                       ],
-                    ),
-                  ],
-                )),
-            Padding(
-                padding: EdgeInsets.only(left: 25.0, right: 25.0, top: 9.0),
-                child: new Row(
-                  mainAxisSize: MainAxisSize.max,
-                  children: <Widget>[
-                    new Flexible(
-                      child: TextField(
-                        controller: _address,
-                        decoration: new InputDecoration(
-                          contentPadding: const EdgeInsets.symmetric(
-                              vertical: 5.0, horizontal: 5),
-                          hintText: 'Enter Address',
-                          border: new OutlineInputBorder(
-                            borderRadius: const BorderRadius.all(
-                              const Radius.circular(5.0),
-                            ),
-                            borderSide: new BorderSide(
-                              color: Colors.black,
-                              width: 1.0,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                )),
-            Padding(
-                padding: EdgeInsets.only(left: 25.0, right: 25.0, top: 25.0),
-                child: new Row(
-                  mainAxisSize: MainAxisSize.max,
-                  children: <Widget>[
-                    new Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        new Text(
-                          'Locate on Map',
-                          style: TextStyle(
-                              fontSize: 16.0, fontWeight: FontWeight.bold),
-                        ),
-                      ],
-                    ),
-                  ],
-                )),
-            Padding(
-                padding: EdgeInsets.only(left: 25.0, right: 25.0, top: 9.0),
-                child: new Row(
-                  mainAxisSize: MainAxisSize.max,
-                  children: <Widget>[
-                    new Container(
-                      height: 150,
-                      width: 325,
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: Colors.black,
-                          width: 1,
-                        ),
-                      ),
-                      child: Center(
-                          child: Text("Map Comming Soon....",
-                              style: TextStyle(fontSize: 20))),
-                    ),
-                  ],
-                )),
-            Padding(
-                padding: EdgeInsets.only(left: 25.0, right: 25.0, top: 25.0),
-                child: new Row(
-                  mainAxisSize: MainAxisSize.max,
-                  children: <Widget>[
-                    new Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        new Text(
-                          'Description',
-                          style: TextStyle(
-                              fontSize: 16.0, fontWeight: FontWeight.bold),
-                        ),
-                      ],
-                    ),
-                  ],
-                )),
-            Padding(
-                padding: EdgeInsets.only(left: 25.0, right: 25.0, top: 9.0),
-                child: new Row(
-                  mainAxisSize: MainAxisSize.max,
-                  children: <Widget>[
-                    new Flexible(
-                        child: new TextField(
-                      controller: _description,
-                      textInputAction: TextInputAction.newline,
-                      keyboardType: TextInputType.multiline,
-                      maxLines: 10,
-                      decoration: new InputDecoration(
-                        contentPadding: const EdgeInsets.symmetric(
-                            vertical: 5.0, horizontal: 5),
-                        hintText: 'Write here',
-                        border: new OutlineInputBorder(
-                          borderRadius: const BorderRadius.all(
-                            const Radius.circular(5.0),
-                          ),
-                          borderSide: new BorderSide(
-                            color: Colors.black,
-                            width: 1.0,
-                          ),
-                        ),
-                      ),
                     )),
-                  ],
-                )),
-            _getActionButtons(),
-          ],
-        ),
-      ),
-    ));
+                Padding(
+                    padding: EdgeInsets.only(left: 25.0, right: 25.0, top: 9.0),
+                    child: new Row(
+                      mainAxisSize: MainAxisSize.max,
+                      children: <Widget>[
+                        new Container(
+                          height: 35,
+                          width: 325,
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Colors.black,
+                              width: 1,
+                            ),
+                          ),
+                          child: Center(
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                DropdownButton(
+                                  value: _selectedEvent,
+                                  items: _dropdownMenuItems,
+                                  onChanged: onChangeDropdownItem,
+                                ),
+                                SizedBox(
+                                  height: 20.0,
+                                ),
+                                Text('Selected: ${_selectedEvent.name}'),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    )),
+                Padding(
+                    padding:
+                        EdgeInsets.only(left: 25.0, right: 25.0, top: 25.0),
+                    child: new Row(
+                      mainAxisSize: MainAxisSize.max,
+                      children: <Widget>[
+                        new Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            new Text(
+                              'Event Address',
+                              style: TextStyle(
+                                  fontSize: 16.0, fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                      ],
+                    )),
+                Padding(
+                    padding: EdgeInsets.only(left: 25.0, right: 25.0, top: 9.0),
+                    child: new Row(
+                      mainAxisSize: MainAxisSize.max,
+                      children: <Widget>[
+                        new Flexible(
+                          child: TextFormField(
+                            controller: _address,
+                            validator: (value) =>
+                                value.isEmpty ? 'Address is required!' : null,
+                            decoration: new InputDecoration(
+                              contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 5.0, horizontal: 5),
+                              hintText: 'Enter Address',
+                              border: new OutlineInputBorder(
+                                borderRadius: const BorderRadius.all(
+                                  const Radius.circular(5.0),
+                                ),
+                                borderSide: new BorderSide(
+                                  color: Colors.black,
+                                  width: 1.0,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    )),
+                Padding(
+                    padding:
+                        EdgeInsets.only(left: 25.0, right: 25.0, top: 25.0),
+                    child: new Row(
+                      mainAxisSize: MainAxisSize.max,
+                      children: <Widget>[
+                        new Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            new Text(
+                              'Locate on Map',
+                              style: TextStyle(
+                                  fontSize: 16.0, fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                      ],
+                    )),
+                Padding(
+                    padding: EdgeInsets.only(left: 25.0, right: 25.0, top: 9.0),
+                    child: new Row(
+                      mainAxisSize: MainAxisSize.max,
+                      children: <Widget>[
+                        new Container(
+                          height: 150,
+                          width: 325,
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Colors.black,
+                              width: 1,
+                            ),
+                          ),
+                          child: Image.network(
+                            'http://10.0.2.2/TourMendWebServices/placesimage/coming.jpg',
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ],
+                    )),
+                Padding(
+                    padding:
+                        EdgeInsets.only(left: 25.0, right: 25.0, top: 25.0),
+                    child: new Row(
+                      mainAxisSize: MainAxisSize.max,
+                      children: <Widget>[
+                        new Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            new Text(
+                              'Description',
+                              style: TextStyle(
+                                  fontSize: 16.0, fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                      ],
+                    )),
+                Padding(
+                    padding: EdgeInsets.only(left: 25.0, right: 25.0, top: 9.0),
+                    child: new Row(
+                      mainAxisSize: MainAxisSize.max,
+                      children: <Widget>[
+                        new Flexible(
+                            child: new TextFormField(
+                          controller: _description,
+                          validator: (value) =>
+                              value.isEmpty ? 'description is required!' : null,
+                          textInputAction: TextInputAction.newline,
+                          keyboardType: TextInputType.multiline,
+                          maxLines: 10,
+                          decoration: new InputDecoration(
+                            contentPadding: const EdgeInsets.symmetric(
+                                vertical: 5.0, horizontal: 5),
+                            hintText: 'Write here',
+                            border: new OutlineInputBorder(
+                              borderRadius: const BorderRadius.all(
+                                const Radius.circular(5.0),
+                              ),
+                              borderSide: new BorderSide(
+                                color: Colors.black,
+                                width: 1.0,
+                              ),
+                            ),
+                          ),
+                        )),
+                      ],
+                    )),
+                _getActionButtons(),
+              ],
+            ),
+          ),
+        ));
   }
 
   Widget _getActionButtons() {
@@ -369,7 +380,11 @@ class MapScreenState extends State<LiveeventsPage>
                 textColor: Colors.white,
                 color: Colors.blue,
                 onPressed: () {
-                  updatefield();
+                  setState(() {
+                    if (_formKey.currentState.validate()) {
+                      updatefield();
+                    }
+                  });
                 },
                 shape: new RoundedRectangleBorder(
                     borderRadius: new BorderRadius.circular(20.0)),
@@ -385,7 +400,9 @@ class MapScreenState extends State<LiveeventsPage>
                 child: new Text("Cancel"),
                 textColor: Colors.white,
                 color: Colors.red,
-                onPressed: () {},
+                onPressed: () {
+                  _clearValues();
+                },
                 shape: new RoundedRectangleBorder(
                     borderRadius: new BorderRadius.circular(20.0)),
               )),
