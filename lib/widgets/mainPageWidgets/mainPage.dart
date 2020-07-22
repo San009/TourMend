@@ -28,7 +28,7 @@ class _MainPageState extends State<MainPage> {
     PlacesPage(
       title: 'Places',
     ),
-    EventPage(),
+    EventsPage(),
     Text(
       'Index 4: News',
       style: optionStyle,

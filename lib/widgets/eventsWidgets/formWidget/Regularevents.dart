@@ -1,19 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import '../../../services/eventService/updateForm.dart';
 
-class RegulareventsPage extends StatefulWidget {
+class RegularEventsPage extends StatefulWidget {
   final String title;
 
-  RegulareventsPage({Key key, this.title}) : super(key: key);
+  RegularEventsPage({Key key, this.title}) : super(key: key);
   @override
-  MapScreenState createState() => MapScreenState();
+  RegularEventsPageState createState() => RegularEventsPageState();
 }
 
-class MapScreenState extends State<RegulareventsPage>
+class RegularEventsPageState extends State<RegularEventsPage>
     with SingleTickerProviderStateMixin {
+  TextEditingController _eventAddress;
+  TextEditingController _eventName;
+  TextEditingController _fromDate;
+  TextEditingController _toDate;
+  TextEditingController _eventDesc;
   @override
   void initState() {
     super.initState();
+    _eventName = TextEditingController();
+    _eventAddress = TextEditingController();
+    _fromDate = TextEditingController();
+    _toDate = TextEditingController();
+    _eventDesc = TextEditingController();
   }
 
   @override
@@ -25,7 +36,7 @@ class MapScreenState extends State<RegulareventsPage>
         children: <Widget>[
           Column(
             children: <Widget>[
-              textSection(),
+              _textSection(),
             ],
           ),
         ],
@@ -33,7 +44,83 @@ class MapScreenState extends State<RegulareventsPage>
     ));
   }
 
-  Form textSection() {
+  void _clearValues() {
+    _eventName.text = '';
+    _eventAddress.text = '';
+    _eventDesc.text = '';
+    _toDate.text = '';
+    _fromDate.text = '';
+  }
+
+  void _updateField() async {
+    Event.regular(
+      _eventName.text,
+      _eventAddress.text,
+      _fromDate.text,
+      _toDate.text,
+      _eventDesc.text,
+    ).then((result) {
+      print(result);
+      if (result == '1') {
+        _clearValues();
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: new Text(
+                  'Pending Approval!\nYou will notified after being approved.'),
+              actions: <Widget>[
+                FlatButton(
+                  child: new Text("OK"),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+        // ignore: unnecessary_statements
+      } else if (result == '0') {
+        _clearValues();
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: new Text('Error while submitting event'),
+              actions: <Widget>[
+                FlatButton(
+                  child: new Text("OK"),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      } else {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: new Text('This email already has an account!'),
+              actions: <Widget>[
+                FlatButton(
+                  child: new Text("OK"),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      }
+    });
+  }
+
+  Form _textSection() {
     return Form(
         child: Container(
       color: Color(0xffFFFFFF),
@@ -67,11 +154,12 @@ class MapScreenState extends State<RegulareventsPage>
                   mainAxisSize: MainAxisSize.max,
                   children: <Widget>[
                     new Flexible(
-                      child: TextField(
+                      child: TextFormField(
+                        controller: _eventName,
                         decoration: new InputDecoration(
                           contentPadding: const EdgeInsets.symmetric(
                               vertical: 5.0, horizontal: 5),
-                          hintText: 'Write event name here',
+                          hintText: 'Event Name',
                           border: new OutlineInputBorder(
                             borderRadius: const BorderRadius.all(
                               const Radius.circular(5.0),
@@ -110,7 +198,8 @@ class MapScreenState extends State<RegulareventsPage>
                   mainAxisSize: MainAxisSize.max,
                   children: <Widget>[
                     new Flexible(
-                      child: TextField(
+                      child: TextFormField(
+                        controller: _eventAddress,
                         decoration: new InputDecoration(
                           contentPadding: const EdgeInsets.symmetric(
                               vertical: 5.0, horizontal: 5),
@@ -161,10 +250,9 @@ class MapScreenState extends State<RegulareventsPage>
                           width: 1,
                         ),
                       ),
-                      child: Image.network(
-                        'http://10.0.2.2/TourMendWebServices/placesimage/coming.jpg',
-                        fit: BoxFit.cover,
-                      ),
+                      child: Center(
+                          child: Text("Map Comming Soon....",
+                              style: TextStyle(fontSize: 20))),
                     ),
                   ],
                 )),
@@ -202,11 +290,12 @@ class MapScreenState extends State<RegulareventsPage>
                       ),
                       height: 35,
                       width: 250,
-                      child: TextField(
+                      child: TextFormField(
+                        controller: _fromDate,
                         decoration: new InputDecoration(
                           contentPadding: const EdgeInsets.symmetric(
                               vertical: 5.0, horizontal: 5),
-                          hintText: 'DD/MM/YY',
+                          hintText: 'DD/MM/YYYY',
                           border: new OutlineInputBorder(
                             borderRadius: const BorderRadius.all(
                               const Radius.circular(5.0),
@@ -237,11 +326,12 @@ class MapScreenState extends State<RegulareventsPage>
                       ),
                       height: 35,
                       width: 275,
-                      child: TextField(
+                      child: TextFormField(
+                        controller: _toDate,
                         decoration: new InputDecoration(
                           contentPadding: const EdgeInsets.symmetric(
                               vertical: 5.0, horizontal: 5),
-                          hintText: 'DD/MM/YY',
+                          hintText: 'DD/MM/YYYY',
                           border: new OutlineInputBorder(
                             borderRadius: const BorderRadius.all(
                               const Radius.circular(5.0),
@@ -280,7 +370,8 @@ class MapScreenState extends State<RegulareventsPage>
                   mainAxisSize: MainAxisSize.max,
                   children: <Widget>[
                     new Flexible(
-                        child: new TextField(
+                        child: new TextFormField(
+                      controller: _eventDesc,
                       textInputAction: TextInputAction.newline,
                       keyboardType: TextInputType.multiline,
                       maxLines: 10,
@@ -307,46 +398,50 @@ class MapScreenState extends State<RegulareventsPage>
       ),
     ));
   }
-}
 
-Widget _getActionButtons() {
-  return Padding(
-    padding: EdgeInsets.only(left: 25.0, right: 25.0, top: 45.0),
-    child: new Row(
-      mainAxisSize: MainAxisSize.max,
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: <Widget>[
-        Expanded(
-          child: Padding(
-            padding: EdgeInsets.only(right: 10.0),
-            child: Container(
-                child: new RaisedButton(
-              child: new Text("Save"),
-              textColor: Colors.white,
-              color: Colors.blue,
-              onPressed: () {},
-              shape: new RoundedRectangleBorder(
-                  borderRadius: new BorderRadius.circular(20.0)),
-            )),
+  Widget _getActionButtons() {
+    return Padding(
+      padding: EdgeInsets.only(left: 25.0, right: 25.0, top: 45.0),
+      child: new Row(
+        mainAxisSize: MainAxisSize.max,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: <Widget>[
+          Expanded(
+            child: Padding(
+              padding: EdgeInsets.only(right: 10.0),
+              child: Container(
+                  child: new RaisedButton(
+                child: new Text("Save"),
+                textColor: Colors.white,
+                color: Colors.blue,
+                onPressed: () {
+                  _updateField();
+                },
+                shape: new RoundedRectangleBorder(
+                    borderRadius: new BorderRadius.circular(20.0)),
+              )),
+            ),
+            flex: 2,
           ),
-          flex: 2,
-        ),
-        Expanded(
-          child: Padding(
-            padding: EdgeInsets.only(left: 10.0),
-            child: Container(
-                child: new RaisedButton(
-              child: new Text("Cancel"),
-              textColor: Colors.white,
-              color: Colors.red,
-              onPressed: () {},
-              shape: new RoundedRectangleBorder(
-                  borderRadius: new BorderRadius.circular(20.0)),
-            )),
+          Expanded(
+            child: Padding(
+              padding: EdgeInsets.only(left: 10.0),
+              child: Container(
+                  child: new RaisedButton(
+                child: new Text("Cancel"),
+                textColor: Colors.white,
+                color: Colors.red,
+                onPressed: () {
+                  _clearValues();
+                },
+                shape: new RoundedRectangleBorder(
+                    borderRadius: new BorderRadius.circular(20.0)),
+              )),
+            ),
+            flex: 2,
           ),
-          flex: 2,
-        ),
-      ],
-    ),
-  );
+        ],
+      ),
+    );
+  }
 }

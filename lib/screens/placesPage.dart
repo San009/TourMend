@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import '../widgets/placesWidgets/nestedTabBar.dart';
 import '../services/fetchPlaces.dart';
-import '../modals/places.dart';
+import '../modals/placeModal/places.dart';
 
 import '../widgets/placesWidgets/searchlist.dart';
 
@@ -81,6 +81,14 @@ class _PlacesPageState extends State<PlacesPage> {
                     style: TextStyle(
                         fontSize: 20.0, height: 1.3, color: Colors.black),
                     controller: _search,
+                    onSubmitted: (value) => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => SearchPage(
+                          tvalue: value,
+                        ),
+                      ),
+                    ),
                     cursorColor: Colors.black,
                     keyboardType: TextInputType.text,
                     textInputAction: TextInputAction.go,
@@ -129,52 +137,7 @@ class _PlacesPageState extends State<PlacesPage> {
                 child: CircularProgressIndicator(),
               );
             }
-            Positioned(
-              top: 30,
-              right: 15,
-              left: 15,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(15.0),
-                ),
-                child: Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: TextField(
-                        cursorColor: Colors.black,
-                        keyboardType: TextInputType.text,
-                        textInputAction: TextInputAction.go,
-                        decoration: InputDecoration(
-                            border: InputBorder.none,
-                            contentPadding:
-                                EdgeInsets.symmetric(horizontal: 15),
-                            hintText: "Search here"),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 8.0),
-                      child: InkWell(
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) =>
-                                      SearchPage(tvalue: _search.text)));
-                        },
-                        child: CircleAvatar(
-                            radius: 15.0,
-                            backgroundColor: Colors.deepPurple,
-                            child: Icon(
-                              Icons.portrait,
-                              size: 20.0,
-                            )),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
+
             return ListView.builder(
                 itemCount: placesData.length,
                 controller: _scrollController,

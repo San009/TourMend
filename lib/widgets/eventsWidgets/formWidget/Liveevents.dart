@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import '../../../services/eventservice/updateform.dart';
+import '../../../services/eventService/updateform.dart';
 
 class LiveeventsPage extends StatefulWidget {
   final String title;
@@ -76,7 +76,7 @@ class MapScreenState extends State<LiveeventsPage>
   }
 
   updatefield() async {
-    Liveevent.live(
+    Event.live(
       _address.text,
       _description.text,
       _selectedEvent.name,
@@ -88,7 +88,8 @@ class MapScreenState extends State<LiveeventsPage>
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: new Text('Pending Approbal\n we will notify'),
+              title: new Text(
+                  'Pending Approval!\nYou will notified after being approved.'),
               actions: <Widget>[
                 FlatButton(
                   child: new Text("OK"),
@@ -107,7 +108,7 @@ class MapScreenState extends State<LiveeventsPage>
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: new Text('Incorrect  password.\nPlease try again!'),
+              title: new Text('Error while submitting event!'),
               actions: <Widget>[
                 FlatButton(
                   child: new Text("OK"),

@@ -74,7 +74,7 @@ class _NestedTabBarState extends State<ReportPage>
             controller: _nestedTabController,
             children: <Widget>[
               LiveeventsPage(),
-              RegulareventsPage(),
+              RegularEventsPage(),
             ],
           ),
         )
