@@ -2,21 +2,21 @@
 
 
 
-if (isset($_POST['eventaddress'], $_POST['description'])) {
+if (isset($_POST['eventAddress'],$_POST['description'],$_POST['eventType'])) {
     include('db_config.php');
 
-    $eventaddress = $_POST['eventaddress'];
+    $eventaddress = $_POST['eventAddress'];
     $description = $_POST['description'];
     $eventType =$_POST['eventType'];
       
-            $sql = "INSERT INTO tbl_events (eventaddress, eventType,description) VALUES ('$eventaddress','$eventType','$description')";
+            $sql = "INSERT INTO tbl_events (eventAddress, eventType,description) VALUES ('$eventaddress','$eventType','$description')";
 
             $executeQurey = mysqli_query($db_conn, $sql);
 
             if ($executeQurey) {
-                echo (json_encode(array('statusCode' => '1', 'message' => 'User successfully registered!')));
+                echo (json_encode(array('statusCode' => '1', 'message' => 'Event submitted!')));
             } else {
-                echo (json_encode(array('statusCode' => '0', 'message' => 'Error while registering user!')));
+                echo (json_encode(array('statusCode' => '0', 'message' => 'Error while submitting event!')));
             }
         
     
