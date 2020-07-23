@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'screens/loginPage.dart';
+
+import 'screens/splashScreen.dart';
 
 void main() => runApp(TourMendApp());
 
@@ -10,16 +11,15 @@ class TourMendApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     return MaterialApp(
-      title: 'TourMend',
-      theme: ThemeData(
-        primaryColor: Colors.lightBlue,
-        accentColor: Colors.lightBlue,
-        textTheme: GoogleFonts.latoTextTheme(textTheme).copyWith(
-          bodyText2: GoogleFonts.montserrat(textStyle: textTheme.bodyText2),
+        title: 'TourMend',
+        theme: ThemeData(
+          primaryColor: Colors.lightBlue,
+          accentColor: Colors.lightBlue,
+          textTheme: GoogleFonts.latoTextTheme(textTheme).copyWith(
+            bodyText2: GoogleFonts.montserrat(textStyle: textTheme.bodyText2),
+          ),
         ),
-      ),
-      debugShowCheckedModeBanner: false,
-      home: LoginPage(),
-    );
+        debugShowCheckedModeBanner: false,
+        home: SplashScreen());
   }
 }

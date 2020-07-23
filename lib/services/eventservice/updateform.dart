@@ -29,9 +29,9 @@ class Event {
   static Future<String> regular(
     String eventName,
     String address,
+    String description,
     String fromDate,
     String toDate,
-    String description,
   ) async {
     try {
       const url = "http://10.0.2.2/TourMendWebServices/regularEventForm.php";

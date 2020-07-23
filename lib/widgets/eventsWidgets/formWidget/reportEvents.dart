@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'regularEvents.dart';
+import 'regularEventWidgets/regularEvents.dart';
 import 'liveEvents.dart';
 //import '../eventsPage.dart';
 
