@@ -54,7 +54,7 @@ class _SplashScreenState extends State<SplashScreen>
                         size: _logoAnimation.value * 100,
                       ),
                       Padding(
-                        padding: EdgeInsets.only(top: 10.0),
+                        padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
                       ),
                       Text(
                         TourMend.name,
@@ -120,7 +120,7 @@ class _SplashScreenState extends State<SplashScreen>
 }
 
 class TourMend {
-  static const String name = "Tourmend";
+  static const String name = "TourMend";
   static const String subName =
-      '"Live with no excuses \n Travel with no regrets"';
+      '"Live with no excuses, \nTravel with no regrets"';
 }

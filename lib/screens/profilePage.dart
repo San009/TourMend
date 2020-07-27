@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_app/services/getUserInfo.dart';
+import 'package:flutter_app/services/profileServices/getUserInfo.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../widgets/profilePageWidgets/editProfilePage.dart';
+import 'package:flutter_advanced_networkimage/provider.dart';
 
 class ProfilePage extends StatefulWidget {
   final String title;
@@ -45,8 +46,11 @@ class _ProfilePageState extends State<ProfilePage> {
                           decoration: BoxDecoration(
                               color: Colors.red,
                               image: DecorationImage(
-                                  image: NetworkImage(
-                                      'https://pixel.nymag.com/imgs/daily/vulture/2017/06/14/14-tom-cruise.w700.h700.jpg'),
+                                  image: AdvancedNetworkImage(
+                                      "http://10.0.2.2/TourMendWebServices/Images/profileImages/" +
+                                          userName +
+                                          ".png",
+                                      fallbackAssetImage: 'asset/Images/tm.jpg'),
                                   fit: BoxFit.cover),
                               borderRadius: BorderRadius.all(Radius.circular(85.0)),
                               boxShadow: [

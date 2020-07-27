@@ -2,15 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-import 'package:http/http.dart' as http;
-import '../../services/editInfo.dart';
-import 'package:email_validator/email_validator.dart';
+import '../../services/profileServices/editinfo.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'uploadAnim.dart';
+import 'dart:ui';
+import 'dart:async';
 
 class EditProfilePage extends StatefulWidget {
   final String title, userName, email;
 
   EditProfilePage({Key key, this.title, this.userName, this.email})
       : super(key: key);
+  static void startProgress() {}
+
   @override
   EditProfilePageState createState() => EditProfilePageState();
 }
@@ -26,8 +30,18 @@ class EditProfilePageState extends State<EditProfilePage>
   String errMessage = 'Error Uploading Image';
   final FocusNode myFocusNode = FocusNode();
   TextEditingController _username;
-  TextEditingController _email;
   TextEditingController _password;
+  SharedPreferences currentEmail;
+  String email;
+  bool _isLoading = false;
+  AnimationController progressController;
+  Animation<double> animation;
+  double _percentage;
+  double _nextPercentage;
+  Timer _timer;
+  AnimationController _progressAnimationController;
+  bool _progressDone;
+  Function startProgress;
 
   @override
   void initState() {
@@ -35,8 +49,14 @@ class EditProfilePageState extends State<EditProfilePage>
     _scaffoldKey = GlobalKey();
     _formKey = GlobalKey<FormState>();
     _username = TextEditingController();
-    _email = TextEditingController();
     _password = TextEditingController();
+    email = '';
+
+    super.initState();
+    _percentage = 0.0;
+    _nextPercentage = 0.0;
+    _timer = null;
+    _progressDone = false;
   }
 
   @override
@@ -96,7 +116,7 @@ class EditProfilePageState extends State<EditProfilePage>
                                         fit: BoxFit.fill,
                                       )
                                     : Image.network(
-                                        "https://n8d.at/wp-content/plugins/aioseop-pro-2.4.11.1/images/default-user-image.png",
+                                        "http://10.0.2.2/TourMendWebServices/Images/person.jpg",
                                         fit: BoxFit.fill,
                                       ),
                               ),
@@ -138,7 +158,6 @@ class EditProfilePageState extends State<EditProfilePage>
 
   void _clearValues() {
     _username.text = '';
-    _email.text = '';
     _password.text = '';
   }
 
@@ -154,8 +173,6 @@ class EditProfilePageState extends State<EditProfilePage>
   void _updatefield() async {
     EditInfo.edit(
       _username.text,
-      widget.email,
-      _email.text,
       _password.text,
     ).then((result) {
       print(result);
@@ -201,7 +218,7 @@ class EditProfilePageState extends State<EditProfilePage>
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: Text('This email already has an account!'),
+              title: Text('Error while updating profile!'),
               actions: <Widget>[
                 FlatButton(
                   child: Text("OK"),
@@ -304,49 +321,6 @@ class EditProfilePageState extends State<EditProfilePage>
                           mainAxisSize: MainAxisSize.min,
                           children: <Widget>[
                             Text(
-                              'Email ID',
-                              style: TextStyle(
-                                  fontSize: 16.0, fontWeight: FontWeight.bold),
-                            ),
-                          ],
-                        ),
-                      ],
-                    )),
-                Padding(
-                    padding: EdgeInsets.only(left: 25.0, right: 25.0, top: 2.0),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.max,
-                      children: <Widget>[
-                        Flexible(
-                          child: TextFormField(
-                            controller: _email,
-                            decoration: const InputDecoration(
-                                hintText: "Enter Email ID"),
-                            enabled: !_editStatus,
-                            validator: (val) {
-                              if (val.isEmpty) {
-                                return 'Email is required!';
-                              } else if (!EmailValidator.Validate(
-                                  val, true, true)) {
-                                return 'Invalid email address!';
-                              } else
-                                return null;
-                            },
-                          ),
-                        ),
-                      ],
-                    )),
-                Padding(
-                    padding:
-                        EdgeInsets.only(left: 25.0, right: 25.0, top: 25.0),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.max,
-                      children: <Widget>[
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: <Widget>[
-                            Text(
                               'Enter current password to update',
                               style: TextStyle(
                                   fontSize: 16.0, fontWeight: FontWeight.bold),
@@ -367,7 +341,7 @@ class EditProfilePageState extends State<EditProfilePage>
                                 const InputDecoration(hintText: "Enter "),
                             enabled: !_editStatus,
                             validator: (val) => val.length < 6
-                                ? 'Password must be atleast 6 characters long!'
+                                ? 'To Update, please enter your Tourmend password!'
                                 : null,
                           ),
                         ),
@@ -395,20 +369,6 @@ class EditProfilePageState extends State<EditProfilePage>
       _image = File(image.path);
       print('Image Path $_image');
     });
-  }
-
-  Future _upload() async {
-    final uri =
-        Uri.parse("http://10.0.2.2/TourMendWebServices/profileimage.php");
-    var request = http.MultipartRequest('POST', uri);
-    var pic = await http.MultipartFile.fromPath("image", _image.path);
-    request.files.add(pic);
-    var response = await request.send();
-    if (response.statusCode == 200) {
-      print('Image Uploaded');
-    } else {
-      print('Image Not Uploaded');
-    }
   }
 
   Widget _getActionButtons() {
@@ -484,7 +444,30 @@ class EditProfilePageState extends State<EditProfilePage>
                 textColor: Colors.white,
                 color: Colors.green,
                 onPressed: () {
-                  _upload();
+                  if (_image != null) {
+                    showDialog(
+                        context: context,
+                        child: CustomDemo(
+                          _image,
+                        ));
+                  } else {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: Text('Sorry!\nSelect Your profile image '),
+                          actions: <Widget>[
+                            FlatButton(
+                              child: Text("OK"),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  }
                 },
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20.0)),

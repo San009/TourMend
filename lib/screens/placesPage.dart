@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
-import '../widgets/placesWidgets/nestedTabBar.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter_app/widgets/jsonListViewWidget/jsonListView.dart';
+import 'package:flutter_app/widgets/placesPageWidgets/placeCard.dart';
+import 'package:flutter_app/widgets/placesPageWidgets/nestedTabBar.dart';
+import 'package:flutter_app/widgets/placesPageWidgets/searchBar.dart';
 import '../services/fetchPlaces.dart';
-import '../modals/placeModal/places.dart';
-
-import '../widgets/placesWidgets/searchlist.dart';
+import '../modals/placesModal/places.dart';
+import '../widgets/placesPageWidgets/searchPage.dart';
 
 class PlacesPage extends StatefulWidget {
   final String title;
@@ -15,25 +18,27 @@ class PlacesPage extends StatefulWidget {
 }
 
 class _PlacesPageState extends State<PlacesPage> {
-  TextEditingController _search = TextEditingController();
-  List<PlacesData> placesData = List();
-  List<PlacesData> filtreddata = List();
+  TextEditingController _search;
+  List<PlacesData> _placesData;
   ScrollController _scrollController;
-  int pageNumber;
-  bool isLoading;
+  int _pageNumber;
+  bool _isLoading, _canSearch, _showSearchBar;
   @override
   void initState() {
-    placesData = filtreddata;
     super.initState();
     _scrollController = ScrollController();
-    pageNumber = 1;
-    isLoading = true;
+    _search = TextEditingController();
+    _pageNumber = 1;
+    _isLoading = true;
+    _canSearch = false;
+    _showSearchBar = true;
+    _placesData = List();
 
     _fetchPlaces().then((result) {
       for (var place in result) {
-        placesData.add(place);
+        _placesData.add(place);
         setState(() {
-          isLoading = false;
+          _isLoading = false;
         });
       }
     });
@@ -43,17 +48,19 @@ class _PlacesPageState extends State<PlacesPage> {
       if (_scrollController.position.pixels ==
           _scrollController.position.maxScrollExtent) {
         setState(() {
-          pageNumber++;
+          _pageNumber++;
         });
         _fetchPlaces().then((result) {
           if (result != null) {
             for (var place in result) {
-              placesData.add(place);
+              _placesData.add(place);
             }
           }
         });
       }
     });
+
+    _handleScroll();
   }
 
   @override
@@ -65,149 +72,103 @@ class _PlacesPageState extends State<PlacesPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(backgroundColor: Colors.white, actions: <Widget>[
-        Expanded(
-          child: Container(
-            margin: EdgeInsets.fromLTRB(18, 2, 18, 2),
-            decoration: BoxDecoration(
-              color: Colors.grey,
-              borderRadius: BorderRadius.circular(150.0),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Expanded(
-                  child: TextField(
-                    style: TextStyle(
-                        fontSize: 20.0, height: 1.3, color: Colors.black),
-                    controller: _search,
-                    onSubmitted: (value) => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => SearchPage(
-                          tvalue: value,
-                        ),
-                      ),
-                    ),
-                    cursorColor: Colors.black,
-                    keyboardType: TextInputType.text,
-                    textInputAction: TextInputAction.go,
-                    decoration: InputDecoration(
-                      border: InputBorder.none,
-                      contentPadding: EdgeInsets.symmetric(horizontal: 15),
-                      hintText: "Search here",
-                      hintStyle: TextStyle(fontSize: 20.0, color: Colors.black),
-                    ),
+      body: Stack(
+        children: <Widget>[
+          Container(
+            padding: _showSearchBar
+                ? EdgeInsets.only(top: 55.0)
+                : EdgeInsets.only(top: 0.0),
+            child: FutureBuilder<List<PlacesData>>(
+              initialData: _placesData,
+              future: _fetchPlaces(),
+              builder: (context, snapshot) {
+                if (_isLoading) {
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+
+                return JsonListView(
+                  snapshot: snapshot,
+                  listData: _placesData,
+                  scrollController: _scrollController,
+                  onTapWidget: (value) => NestedTabBar(
+                    placeData: _placesData[value],
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(right: 2.0),
-                  child: InkWell(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => SearchPage(
-                            tvalue: _search.text,
-                          ),
-                        ),
-                      );
-                    },
-                    child: CircleAvatar(
-                        radius: 24.0,
-                        backgroundColor: Colors.deepPurple,
-                        child: Icon(
-                          Icons.search,
-                          size: 24.0,
-                        )),
+                  childWidget: (value) => PlaceCard(
+                    placesData: _placesData,
+                    index: value,
                   ),
-                ),
-              ],
+                );
+              },
             ),
           ),
-        ),
-      ]),
-      body: Container(
-        child: FutureBuilder<List<PlacesData>>(
-          initialData: placesData,
-          future: _fetchPlaces(),
-          builder: (context, snapshot) {
-            if (isLoading) {
-              return Center(
-                child: CircularProgressIndicator(),
-              );
-            }
-
-            return ListView.builder(
-                itemCount: placesData.length,
-                controller: _scrollController,
-                physics: AlwaysScrollableScrollPhysics(),
-                itemBuilder: (context, index) {
-                  if (snapshot.data != null) {
-                    if (snapshot.data.length + 1 == index) {
-                      return Center(
-                        child: CircularProgressIndicator(),
-                      );
-                    }
-                  }
-                  return GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => NestedTabBar(
-                            placeData: placesData[index],
-                          ),
-                        ),
-                      );
-                    },
-                    child: Card(
-                      elevation: 10.0,
-                      margin: EdgeInsets.only(top: 10.0, bottom: 10.0),
-                      child: Container(
-                        padding: EdgeInsets.fromLTRB(4.0, 10.0, 4.0, 4.0),
-                        child: Column(children: <Widget>[
-                          Padding(
-                            padding: EdgeInsets.only(bottom: 10.0),
-                            child: Image.network(
-                              placesData[index].placesImageURL,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                          Row(children: <Widget>[
-                            Padding(
-                                child: Text(
-                                  placesData[index].placeName,
-                                  style: new TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 18),
-                                  textAlign: TextAlign.right,
-                                ),
-                                padding: EdgeInsets.all(1.0)),
-                            Text(" | "),
-                            Padding(
-                                child: Text(
-                                  placesData[index].destination,
-                                  style: new TextStyle(
-                                      fontStyle: FontStyle.italic),
-                                  textAlign: TextAlign.right,
-                                ),
-                                padding: EdgeInsets.all(1.0)),
-                          ]),
-                          // Divider(color: Colors.black),
-                        ]),
-                      ),
-                    ),
-                  );
-                });
-          },
-        ),
+          Visibility(
+            visible: _showSearchBar,
+            child: SearchBar(
+              canSearch: _canSearch,
+              searchController: _search,
+              onValueChanged: (value) {
+                if (value.isNotEmpty) {
+                  setState(() {
+                    _canSearch = true;
+                  });
+                } else {
+                  setState(() {
+                    _canSearch = false;
+                  });
+                }
+              },
+              onSubmit: (value) {
+                if (value.isEmpty) {
+                  setState(() {
+                    _canSearch = false;
+                  });
+                  return;
+                }
+                _goToSearch(value);
+              },
+              onTap: () {
+                _goToSearch(_search.text);
+              },
+            ),
+          )
+        ],
       ),
     );
   }
 
   Future<List<PlacesData>> _fetchPlaces() {
-    return FetchPlaces.fetchPlaces(pageNumber: pageNumber)
+    return FetchPlaces.fetchPlaces(pageNumber: _pageNumber)
         .then((value) => value.places);
+  }
+
+  void _goToSearch(String value) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => SearchPage(
+          searchString: value,
+        ),
+      ),
+    );
+  }
+
+  void _handleScroll() async {
+    _scrollController.addListener(() {
+      if (_scrollController.position.userScrollDirection ==
+              ScrollDirection.reverse &&
+          _scrollController.position.pixels >= 36) {
+        setState(() {
+          _showSearchBar = false;
+        });
+      }
+      if (_scrollController.position.userScrollDirection ==
+          ScrollDirection.forward) {
+        setState(() {
+          _showSearchBar = true;
+        });
+      }
+    });
   }
 }

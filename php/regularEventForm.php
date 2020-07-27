@@ -1,35 +1,34 @@
 <?php
+if (isset($_POST['userEmail'], $_POST['eventName'], $_POST['eventAddress'], $_POST['eventDesc'], $_POST['fromDate'], $_POST['toDate'])) {
+    require_once 'db_config.php';
 
-
-
-if (isset($_POST['eventName'],$_POST['eventAddress'],$_POST['description'],$_POST['fromDate'],$_POST['toDate'])) {
-    include('db_config.php');
-
-
+    $userEmail = $_POST['userEmail'];
     $fromDate = $_POST['fromDate'];
     $toDate = $_POST['toDate'];
     $eventName = $_POST['eventName'];
     $eventAddress = $_POST['eventAddress'];
-    $description = $_POST['description'];
+    $eventDesc = $_POST['eventDesc'];
     $approval = "pending";
-   
+    $eventType = "regular";
 
-   $sql = "INSERT INTO tbl_events (eventName, eventAddress, fromDate, toDate, description,approval) VALUES ('$eventName','$eventAddress','$fromDate','$toDate','$description','$approval')";
+    $getUserId = "SELECT id FROM user_info WHERE email='$userEmail'";
+    $executeQuery = mysqli_query($db_conn, $getUserId);
 
+    if ($executeQuery) {
+        $userInfo = mysqli_fetch_assoc($executeQuery);
+        $userId = $userInfo['id'];
+    }
+    //else statement
 
-    $executeQurey = mysqli_query($db_conn, $sql);
+    $sql = "INSERT INTO tbl_events (user_id, type, name, address, from_date, to_date, description, approval) VALUES ('$userId', '$eventType', '$eventName', '$eventAddress', '$fromDate', '$toDate', '$eventDesc', '$approval')";
 
-            if ($executeQurey) {
-                echo (json_encode(array('statusCode' => '1', 'message' => 'Event submitted!')));
-            } else {
-                echo (json_encode(array('statusCode' => '0', 'message' => 'Error while submitting event!')));
-            }
-        
-    
+    $executeQuery = mysqli_query($db_conn, $sql);
 
+    if ($executeQuery) {
+        echo (json_encode(array('statusCode' => '1', 'message' => 'Event submitted!')));
+    } else {
+        echo (json_encode(array('statusCode' => '0', 'message' => 'Error while submitting event!')));
+    }
     mysqli_close($db_conn);
-  
-	
-	
 } else echo (json_encode(array('statusCode' => '4', 'message' => 'Error in method!')));
 return;

@@ -11,7 +11,7 @@ if (isset($_GET['page_number'])) {
 
     $to = ($page_number - 1) * $item_count;
 
-    $sql = "SELECT * FROM tbl_events ORDER BY eventType LIMIT $item_count OFFSET $to";
+    $sql = "SELECT * FROM tbl_events ORDER BY type LIMIT $item_count OFFSET $to";
 
     $result = mysqli_query($db_conn, $sql);
 
@@ -19,23 +19,32 @@ if (isset($_GET['page_number'])) {
         if (mysqli_num_rows($result) <= 3 && mysqli_num_rows($result) != 0) {
             $response['statusCode'] = '1';
             $response['message'] = 'Data fetched successfully!';
+
             $rowArray =  array();
 
             while ($row = mysqli_fetch_assoc($result)) {
+                $getUser = "SELECT username FROM user_info WHERE id = '" . $row['user_id'] . "'";
+                $resultUser = mysqli_query($db_conn, $getUser);
+
+                // if else
+
+                $assocUser = mysqli_fetch_assoc($resultUser);
+
                 $rowItems = array(
                     'id' => $row['id'],
-                    'eventType' => $row['eventType'],
-                    'eventName' => $row['eventName'],
-                    'eventAddress' => $row['eventAddress'],
-                    'fromDate' => $row['fromDate'],
-                    'toDate' => $row['toDate'],
-                    'eventImage' => $row['eventImage'],
-                    'description' => $row['description'],
+                    'userName' => $assocUser['username'],
+                    'eventType' => $row['type'],
+                    'eventName' => $row['name'],
+                    'eventAddress' => $row['address'],
+                    'fromDate' => $row['from_date'],
+                    'toDate' => $row['to_date'],
+                    'eventImage' => $row['image'],
+                    'eventDesc' => $row['description'],
                 );
                 array_push($rowArray, $rowItems);
             }
 
-            $response['places'] = $rowArray;
+            $response['events'] = $rowArray;
             echo json_encode($response);
         } else {
             $response['statusCode'] = '2';

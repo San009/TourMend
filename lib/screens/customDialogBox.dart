@@ -1,12 +1,33 @@
 import 'package:flutter/material.dart';
 import '../widgets/homePageWidgets/customListTile.dart';
 import 'profilePage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../services/profileServices/getUserInfo.dart';
+import '../widgets/homePageWidgets/LogoutOverlay.dart';
+import 'package:flutter_advanced_networkimage/provider.dart';
 
-class CustomDialogBox extends StatelessWidget {
-  CustomDialogBox({this.userEmail, this.logoutFunciton});
-
+class CustomDialogBox extends StatefulWidget {
   final String userEmail;
   final Function logoutFunciton;
+  CustomDialogBox({Key key, this.userEmail, this.logoutFunciton})
+      : super(key: key);
+  @override
+  _CustomDialogBoxState createState() => new _CustomDialogBoxState();
+}
+
+class _CustomDialogBoxState extends State<CustomDialogBox> {
+  String userEmail;
+  Function logoutFunciton;
+  String userName, email;
+  SharedPreferences currentEmail;
+
+  @override
+  void initState() {
+    super.initState();
+    userName = '';
+    email = '';
+    _getUserInfo();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,18 +41,18 @@ class CustomDialogBox extends StatelessWidget {
         child: Column(
           children: <Widget>[
             Padding(
-              padding: const EdgeInsets.only(bottom: 15.0),
-              child: CircleAvatar(
-                radius: 40.0,
-                backgroundColor: Colors.deepPurple,
-                child: Icon(
-                  Icons.portrait,
-                  size: 50.0,
-                ),
-              ),
-            ),
+                padding: const EdgeInsets.only(bottom: 15.0),
+                child: CircleAvatar(
+                  radius: 40.0,
+                  backgroundColor: Colors.blue,
+                  backgroundImage: AdvancedNetworkImage(
+                      "http://10.0.2.2/TourMendWebServices/Images/profileImages/" +
+                          userName +
+                          ".png",
+                      fallbackAssetImage: 'asset/Images/tm.jpg'),
+                )),
             Center(
-              child: Text(userEmail),
+              child: Text(userName),
             )
           ],
         ),
@@ -60,14 +81,33 @@ class CustomDialogBox extends StatelessWidget {
                   CustomListTile(Icons.notifications, 'Notification', () => {}),
                   CustomListTile(Icons.settings, 'Setting', () => {}),
                   CustomListTile(
-                    Icons.lock,
-                    'Log Out',
-                    logoutFunciton,
-                  ),
+                      Icons.lock,
+                      'Log Out',
+                      () => {
+                            showDialog(
+                              context: context,
+                              builder: (_) => LogoutOverlay(),
+                            )
+                          }),
                 ],
               ),
             )),
       ],
     );
+  }
+
+  void _getUserInfo() async {
+    currentEmail = await SharedPreferences.getInstance();
+    setState(() {
+      email = currentEmail.getString('user_email');
+    });
+
+    GetUserInfo.getUserInfo(email).then((result) {
+      if (result != null) {
+        setState(() {
+          userName = result;
+        });
+      }
+    });
   }
 }

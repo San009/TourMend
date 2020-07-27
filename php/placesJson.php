@@ -11,7 +11,7 @@ if (isset($_GET['page_number'])) {
 
     $to = ($page_number - 1) * $item_count;
 
-    $sql = "SELECT * FROM tbl_places ORDER BY placename LIMIT $item_count OFFSET $to";
+    $sql = "SELECT * FROM tbl_places ORDER BY name LIMIT $item_count OFFSET $to";
 
     $result = mysqli_query($db_conn, $sql);
 
@@ -24,11 +24,11 @@ if (isset($_GET['page_number'])) {
             while ($row = mysqli_fetch_assoc($result)) {
                 $rowItems = array(
                     'id' => $row['id'],
-                    'placeName' => $row['placename'],
-                    'imgURL' => $row['placeimage'],
-                    'destination' => $row['dst'],
+                    'placeName' => $row['name'],
+                    'img' => $row['image'],
+                    'destination' => $row['destination'],
                     'info' => $row['info'],
-                    'itinerary' => $row['Itinerary'],
+                    'itinerary' => $row['itinerary'],
                     'map' => $row['map'],
                 );
                 array_push($rowArray, $rowItems);

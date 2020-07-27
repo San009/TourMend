@@ -6,7 +6,7 @@ if (isset($_GET['page_number'], $_GET['keyword'])) {
     require_once 'db_config.php';
     $keyword = $_GET['keyword'];
     $page_number = $_GET['page_number'];
-    $item_count = 4;
+    $item_count = 3;
 
     $to = ($page_number - 1) * $item_count;
 
@@ -19,7 +19,7 @@ if (isset($_GET['page_number'], $_GET['keyword'])) {
 
 
     if ($result) {
-        if (mysqli_num_rows($result) <= 4 && mysqli_num_rows($result) != 0) {
+        if (mysqli_num_rows($result) <= 3 && mysqli_num_rows($result) != 0) {
             $response['statusCode'] = '1';
             $response['message'] = 'Data fetched successfully!';
             $rowArray =  array();

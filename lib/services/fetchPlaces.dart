@@ -1,6 +1,6 @@
 import 'dart:convert';
-import '../modals/placeModal/placesList.dart';
-import '../modals/placeModal/places.dart';
+import '../modals/placesModal/placesList.dart';
+import '../modals/placesModal/places.dart';
 import 'package:http/http.dart' as http;
 
 class FetchPlaces {
@@ -20,7 +20,7 @@ class FetchPlaces {
             var placeData = PlacesData(
               placeName: place['placeName'],
               id: place['id'],
-              placesImageURL: place['imgURL'],
+              placeImage: place['img'],
               destination: place['destination'],
               map: place['map'],
               info: place['info'],
@@ -54,16 +54,16 @@ class FetchPlaces {
     }
   }
 
-  static Future<PlacesList> search(String _search, {int pageNumber}) async {
+  static Future<PlacesList> search(String search, {int pageNumber}) async {
     final places = List<PlacesData>();
 
     try {
       var response = await http.get(Uri.encodeFull(
           "http://10.0.2.2/TourMendWebServices/searchList.php?keyword=" +
-              _search.toString() +
+              search.toString() +
               "&page_number=" +
               pageNumber.toString()));
-      print(_search);
+      print(search);
       print(pageNumber);
       final respJson = jsonDecode(response.body);
 
@@ -73,7 +73,7 @@ class FetchPlaces {
             var placeData = PlacesData(
               placeName: place['placeName'],
               id: place['id'],
-              placesImageURL: place['imgURL'],
+              placeImage: place['img'],
               destination: place['destination'],
               map: place['map'],
               info: place['info'],
