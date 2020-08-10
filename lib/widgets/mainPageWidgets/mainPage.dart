@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../screens/homePage.dart';
 import '../../screens/placesPage.dart';
 import '../../screens/eventsPage.dart';
+import '../../screens/newsPage.dart';
 
 class MainPage extends StatefulWidget {
   MainPage({Key key, this.title}) : super(key: key);
@@ -29,10 +30,7 @@ class _MainPageState extends State<MainPage> {
       title: 'Places',
     ),
     EventsPage(),
-    Text(
-      'Index 4: News',
-      style: optionStyle,
-    ),
+    NewsPage(),
     Text(
       'Index 5: Saved',
       style: optionStyle,
@@ -84,8 +82,8 @@ class _MainPageState extends State<MainPage> {
               label: 'News',
             ),
             FFNavigationBarItem(
-              iconData: Icons.save,
-              label: 'Saved',
+              iconData: Icons.photo_library,
+              label: 'Gallery',
             ),
           ],
         ),

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app/services/profileServices/getUserInfo.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../widgets/profilePageWidgets/editProfilePage.dart';
-import 'package:flutter_advanced_networkimage/provider.dart';
 
 class ProfilePage extends StatefulWidget {
   final String title;
@@ -13,7 +12,7 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   // bool _isLoading = false;
-  String userName, email;
+  String userName, userImage, email;
   SharedPreferences currentEmail;
 
   @override
@@ -21,6 +20,7 @@ class _ProfilePageState extends State<ProfilePage> {
     super.initState();
     userName = '';
     email = '';
+    userImage = '';
     _getUserInfo();
   }
 
@@ -46,13 +46,12 @@ class _ProfilePageState extends State<ProfilePage> {
                           decoration: BoxDecoration(
                               color: Colors.red,
                               image: DecorationImage(
-                                  image: AdvancedNetworkImage(
-                                      "http://10.0.2.2/TourMendWebServices/Images/profileImages/" +
-                                          userName +
-                                          ".png",
-                                      fallbackAssetImage: 'asset/Images/tm.jpg'),
+                                  image: NetworkImage(
+                                    "http://10.0.2.2/TourMendWebServices/Images/profileImages/$userImage ",
+                                  ),
                                   fit: BoxFit.cover),
-                              borderRadius: BorderRadius.all(Radius.circular(85.0)),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(85.0)),
                               boxShadow: [
                                 BoxShadow(blurRadius: 7.0, color: Colors.black)
                               ]))),
@@ -128,6 +127,13 @@ class _ProfilePageState extends State<ProfilePage> {
       if (result != null) {
         setState(() {
           userName = result;
+        });
+      }
+    });
+    GetUserInfo.getUserImage(email).then((result) {
+      if (result != null) {
+        setState(() {
+          userImage = result;
         });
       }
     });

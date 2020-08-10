@@ -8,7 +8,6 @@ import 'loginPage.dart';
 import 'customDialogBox.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../services/profileServices/getUserInfo.dart';
-import 'package:flutter_advanced_networkimage/provider.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key key, this.title}) : super(key: key);
@@ -21,7 +20,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   SharedPreferences preferences;
-  String userName, userEmail;
+  String userImage, userEmail;
 
   final CameraPosition _initialPosition =
       CameraPosition(target: LatLng(28.260075, 83.970093), zoom: 13.0);
@@ -44,7 +43,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    userName = '';
+    userImage = '';
     _getUserEmail();
   }
 
@@ -113,11 +112,6 @@ class _HomePageState extends State<HomePage> {
                     child: CircleAvatar(
                       radius: 15.0,
                       backgroundColor: Colors.blue,
-                      backgroundImage: AdvancedNetworkImage(
-                          "http://10.0.2.2/TourMendWebServices/Images/profileImages/" +
-                              userName +
-                              ".png",
-                          fallbackAssetImage: 'asset/Images/tm.jpg'),
                     ),
                   ),
                 ),
@@ -189,10 +183,10 @@ class _HomePageState extends State<HomePage> {
     preferences = await SharedPreferences.getInstance();
     userEmail = preferences.getString('user_email');
 
-    GetUserInfo.getUserInfo(userEmail).then((result) {
+    GetUserInfo.getUserImage(userEmail).then((result) {
       if (result != null) {
         setState(() {
-          userName = result;
+          userImage = result;
         });
       }
     });

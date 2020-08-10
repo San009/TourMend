@@ -4,7 +4,6 @@ import 'profilePage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/profileServices/getUserInfo.dart';
 import '../widgets/homePageWidgets/LogoutOverlay.dart';
-import 'package:flutter_advanced_networkimage/provider.dart';
 
 class CustomDialogBox extends StatefulWidget {
   final String userEmail;
@@ -18,7 +17,7 @@ class CustomDialogBox extends StatefulWidget {
 class _CustomDialogBoxState extends State<CustomDialogBox> {
   String userEmail;
   Function logoutFunciton;
-  String userName, email;
+  String userName, userImage, email;
   SharedPreferences currentEmail;
 
   @override
@@ -26,6 +25,7 @@ class _CustomDialogBoxState extends State<CustomDialogBox> {
     super.initState();
     userName = '';
     email = '';
+    userImage = '';
     _getUserInfo();
   }
 
@@ -45,11 +45,9 @@ class _CustomDialogBoxState extends State<CustomDialogBox> {
                 child: CircleAvatar(
                   radius: 40.0,
                   backgroundColor: Colors.blue,
-                  backgroundImage: AdvancedNetworkImage(
-                      "http://10.0.2.2/TourMendWebServices/Images/profileImages/" +
-                          userName +
-                          ".png",
-                      fallbackAssetImage: 'asset/Images/tm.jpg'),
+                  backgroundImage: NetworkImage(
+                    "http://10.0.2.2/TourMendWebServices/Images/profileImages/$userImage ",
+                  ),
                 )),
             Center(
               child: Text(userName),
@@ -106,6 +104,13 @@ class _CustomDialogBoxState extends State<CustomDialogBox> {
       if (result != null) {
         setState(() {
           userName = result;
+        });
+      }
+    });
+    GetUserInfo.getUserImage(email).then((result) {
+      if (result != null) {
+        setState(() {
+          userImage = result;
         });
       }
     });

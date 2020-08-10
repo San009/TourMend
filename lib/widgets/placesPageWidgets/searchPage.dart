@@ -54,9 +54,7 @@ class _SearchPageState extends State<SearchPage> {
                 FlatButton(
                   child: new Text("OK"),
                   onPressed: () {
-                    Navigator.of(context).pushAndRemoveUntil(
-                        MaterialPageRoute(builder: (context) => PlacesPage()),
-                        (route) => false);
+                    Navigator.pop(context);
                   },
                 ),
               ],

@@ -216,10 +216,6 @@ class RegularEventsPageState extends State<RegularEventsPage>
                               width: 1,
                             ),
                           ),
-                          child: Image.asset(
-                            'assets/places/coming.jpg',
-                            fit: BoxFit.cover,
-                          ),
                         ),
                       ],
                     )),

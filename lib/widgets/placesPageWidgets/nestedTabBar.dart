@@ -131,8 +131,8 @@ class _NestedTabBarState extends State<NestedTabBar>
                 ),
               ),
               new PhotoView(
-                  imageProvider:
-                      AssetImage('assets/maps/${widget.placeData.map}'),
+                  imageProvider: NetworkImage(
+                      'http://10.0.2.2/TourMendWebServices/Images/maps/${widget.placeData.map}'),
                   minScale: PhotoViewComputedScale.contained * 0.8,
                   maxScale: 4.0),
             ],

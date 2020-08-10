@@ -313,10 +313,6 @@ class LiveEventsPageState extends State<LiveEventsPage>
                           width: 1,
                         ),
                       ),
-                      child: Image.asset(
-                        'assets/places/coming.jpg',
-                        fit: BoxFit.cover,
-                      ),
                     ),
                   ],
                 )),
