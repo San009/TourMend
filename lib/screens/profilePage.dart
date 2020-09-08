@@ -47,7 +47,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               color: Colors.red,
                               image: DecorationImage(
                                   image: NetworkImage(
-                                    "http://10.0.2.2/TourMendWebServices/Images/profileImages/$userImage ",
+                                    "http://10.0.2.2/TourMendWebServices/Images/profileImages/$userImage",
                                   ),
                                   fit: BoxFit.cover),
                               borderRadius:

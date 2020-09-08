@@ -5,7 +5,7 @@ import 'package:flutter_app/widgets/jsonListViewWidget/jsonListView.dart';
 import 'package:flutter_app/widgets/newsWidgets/newsCard.dart';
 //import 'package:flutter_app/widgets/placesPageWidgets/nestedTabBar.dart';
 import 'package:flutter_app/widgets/placesPageWidgets/searchBar.dart';
-import '../services/fetchnews.dart';
+import '../services/fetchNews.dart';
 import '../modals/newsModal/news.dart';
 import '../widgets/placesPageWidgets/searchPage.dart';
 import '../widgets/newsWidgets/detailNews.dart';
