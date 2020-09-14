@@ -45,6 +45,9 @@ class _CustomDialogBoxState extends State<CustomDialogBox> {
                 child: CircleAvatar(
                   radius: 40.0,
                   backgroundColor: Colors.blue,
+                  backgroundImage: NetworkImage(
+                    "http://10.0.2.2/TourMendWebServices/Images/profileImages/$userImage",
+                  ),
                 )),
             Center(
               child: Text(userName),
