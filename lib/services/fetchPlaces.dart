@@ -18,9 +18,9 @@ class FetchPlaces {
         if (respJson['places'] != null) {
           for (var place in respJson['places']) {
             var placeData = PlacesData(
-              placeName: place['placeName'],
+              name: place['name'],
               id: place['id'],
-              placeImage: place['img'],
+              image: place['image'],
               destination: place['destination'],
               map: place['map'],
               info: place['info'],
@@ -63,17 +63,17 @@ class FetchPlaces {
               search.toString() +
               "&page_number=" +
               pageNumber.toString()));
-      print(search);
-      print(pageNumber);
+      // print(search);
+      // print(pageNumber);
       final respJson = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
         if (respJson['places'] != null) {
           for (var place in respJson['places']) {
             var placeData = PlacesData(
-              placeName: place['placeName'],
+              name: place['name'],
               id: place['id'],
-              placeImage: place['img'],
+              image: place['image'],
               destination: place['destination'],
               map: place['map'],
               info: place['info'],

@@ -1,20 +1,263 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
-
+import 'package:flutter_app/screens/commentPage.dart';
+import 'package:flutter_app/services/commentServices/addComment.dart';
 import '../../modals/newsModal/news.dart';
+import '../commentWidgets/commentInputWidget.dart';
 
 class DetailNews extends StatefulWidget {
   final NewsData newsData;
-  DetailNews({Key key, this.newsData}) : super(key: key);
+  final String userEmail;
+  DetailNews({
+    Key key,
+    @required this.newsData,
+    @required this.userEmail,
+  }) : super(key: key);
   _DetailNewsState createState() => _DetailNewsState();
 }
 
 class _DetailNewsState extends State<DetailNews> with TickerProviderStateMixin {
+  TextEditingController _commentController;
+  bool _canComment, _isLiked;
+  GlobalKey<ScaffoldState> _scaffoldKey;
+
   @override
   void initState() {
     super.initState();
+    _scaffoldKey = GlobalKey();
+    _commentController = TextEditingController();
+    _canComment = _isLiked = false;
   }
 
-  void showDialog() {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      key: _scaffoldKey,
+      appBar: AppBar(
+        elevation: 0.0,
+        centerTitle: true,
+        backgroundColor: Colors.transparent,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        title: Text(
+          'News',
+          style: TextStyle(
+            letterSpacing: 8.0,
+            shadows: [
+              Shadow(color: Colors.grey[300], offset: Offset(10.0, 5.0))
+            ],
+            fontSize: 30.0,
+            fontFamily: 'BioRhyme',
+            fontWeight: FontWeight.w600,
+            color: Colors.black,
+          ),
+        ),
+        actions: [
+          IconButton(
+            alignment: Alignment.center,
+            splashRadius: 20.0,
+            icon: Icon(
+              Icons.share,
+              size: 20.0,
+            ),
+            onPressed: () => _showDialog(),
+          ),
+          IconButton(
+              icon: Icon(
+                Icons.comment,
+                size: 20.0,
+              ),
+              splashRadius: 20.0,
+              onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => CommentPage(
+                        commentBox: _commentBox(showLikeButton: false),
+                        newsId: widget.newsData.id,
+                        userEmail: widget.userEmail,
+                      ))))
+        ],
+      ),
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          SingleChildScrollView(
+            child: Container(
+              margin: EdgeInsets.only(bottom: 85.0),
+              child: Column(
+                children: [
+                  Padding(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
+                    child: Text(
+                      widget.newsData.headLine,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 20.0,
+                        fontWeight: FontWeight.bold,
+                        height: 1.5,
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    child: Image.network(
+                      'http://10.0.2.2/TourMendWebServices/Images/news/${widget.newsData.image}',
+                      fit: BoxFit.cover,
+                      height: 250.0,
+                    ),
+                    padding: EdgeInsets.all(10.0),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(left: 15.0, right: 15.0, top: 5.0),
+                    child: Text(
+                      widget.newsData.des,
+                      textAlign: TextAlign.left,
+                      style: TextStyle(
+                        fontSize: 18.0,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                  Container(
+                    margin: EdgeInsets.only(
+                      left: 15.0,
+                      right: 15.0,
+                      top: 20.0,
+                    ),
+                    decoration: BoxDecoration(
+                      border: Border.symmetric(
+                        vertical: BorderSide(
+                          color: Colors.grey[500],
+                          width: 1.0,
+                        ),
+                      ),
+                    ),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 20.0,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        Row(
+                          children: [
+                            IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  _isLiked = !_isLiked;
+                                });
+                              },
+                              icon: Icon(Icons.thumb_up),
+                              color: (_isLiked) ? Colors.blue : Colors.grey,
+                            ),
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 5.0),
+                              child: Text(
+                                '150',
+                              ),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            IconButton(
+                                onPressed: () {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (context) => CommentPage(
+                                        commentBox:
+                                            _commentBox(showLikeButton: false),
+                                        newsId: widget.newsData.id,
+                                        userEmail: widget.userEmail,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                icon: Icon(Icons.comment),
+                                color: Colors.black87),
+                            Padding(
+                              padding: EdgeInsets.only(left: 5.0),
+                              child: Text('150'),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: 10.0,
+            child: _commentBox(showLikeButton: true),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showSnackBar(context, message) {
+    _scaffoldKey.currentState.showSnackBar(
+      SnackBar(
+        content: Text(message),
+      ),
+    );
+  }
+
+  void _addComment({String comment}) async {
+    AddComments.addComment(comment, widget.userEmail, widget.newsData.id)
+        .then((result) {
+      print(result);
+      if (result == '1') {
+        _showSnackBar(context, 'Comment added!');
+        _commentController.text = '';
+      } else if (result == '0') {
+        _showSnackBar(context, 'Error while adding comment!');
+      } else if (result == '2') {
+        _showSnackBar(context, 'Email while fetching user id!');
+      } else if (result == '3') {
+        _showSnackBar(context, 'Error in method!');
+      }
+    });
+  }
+
+  Widget _commentBox({bool showLikeButton}) {
+    return CommentInputWidget(
+      showLike: showLikeButton,
+      isLiked: _isLiked,
+      newsId: widget.newsData.id,
+      commentController: _commentController,
+      canComment: _canComment,
+      onLikePressed: () {
+        setState(() {
+          _isLiked = !_isLiked;
+        });
+      },
+      onValueChanged: (value) {
+        if (value.isNotEmpty) {
+          setState(() {
+            _canComment = true;
+          });
+        } else {
+          setState(() {
+            _canComment = false;
+          });
+        }
+      },
+      onSubmit: (value) {
+        if (value.isEmpty) {
+          setState(() {
+            _canComment = false;
+          });
+          return;
+        }
+        _addComment(comment: value);
+      },
+      onTap: () => _addComment(comment: _commentController.text),
+    );
+  }
+
+  void _showDialog() {
     showGeneralDialog(
       barrierLabel: "Barrier",
       barrierDismissible: true,
@@ -45,7 +288,7 @@ class _DetailNewsState extends State<DetailNews> with TickerProviderStateMixin {
                                     width: 56,
                                     height: 56, // inkwell color
                                     child: Image.asset(
-                                        'assets/Images/facebook.png')),
+                                        'assets/social_media/facebook.png')),
                                 onTap: () {},
                               ),
                             ),
@@ -53,7 +296,11 @@ class _DetailNewsState extends State<DetailNews> with TickerProviderStateMixin {
                       Container(
                           child: Text(
                         "Facebook",
-                        style: TextStyle(fontSize: 15, color: Colors.grey[700]),
+                        style: TextStyle(
+                          fontSize: 15,
+                          color: Colors.grey[700],
+                          decoration: TextDecoration.none,
+                        ),
                       ))
                       // inkwell color
                     ]),
@@ -69,7 +316,7 @@ class _DetailNewsState extends State<DetailNews> with TickerProviderStateMixin {
                                     width: 56,
                                     height: 56,
                                     child: Image.asset(
-                                        'assets/Images/twitter.png')),
+                                        'assets/social_media/twitter.png')),
                                 onTap: () {},
                               ),
                             ),
@@ -77,7 +324,11 @@ class _DetailNewsState extends State<DetailNews> with TickerProviderStateMixin {
                       Container(
                           child: Text(
                         "Twitter",
-                        style: TextStyle(fontSize: 15, color: Colors.grey[700]),
+                        style: TextStyle(
+                            fontSize: 15,
+                            color: Colors.grey[700],
+                            decoration: TextDecoration.none,
+                            fontStyle: FontStyle.normal),
                       ))
                     ])
                   ],
@@ -91,7 +342,7 @@ class _DetailNewsState extends State<DetailNews> with TickerProviderStateMixin {
                             left: 40.0, right: 10.0, top: 10.0, bottom: 10.0),
                         child: ButtonTheme(
                             height: 35.0,
-                            minWidth: 310.0,
+                            minWidth: MediaQuery.of(context).size.width - 100,
                             child: RaisedButton(
                               color: Colors.white,
                               shape: RoundedRectangleBorder(
@@ -108,10 +359,6 @@ class _DetailNewsState extends State<DetailNews> with TickerProviderStateMixin {
                               onPressed: () {
                                 setState(() {
                                   Navigator.of(context).pop(false);
-                                  /* Route route = MaterialPageRoute(
-                                          builder: (context) => LoginScreen());
-                                      Navigator.pushReplacement(context, route);
-                                   */
                                 });
                               },
                             ))),
@@ -133,144 +380,6 @@ class _DetailNewsState extends State<DetailNews> with TickerProviderStateMixin {
           child: child,
         );
       },
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        title: Center(
-            child: Text(
-          'News ',
-          style: TextStyle(
-            decoration: TextDecoration.none,
-            color: Colors.white,
-          ),
-        )),
-        actions: <Widget>[
-          FlatButton(
-            child: Row(
-              // Replace with a Row for horizontal icon + text
-              children: <Widget>[
-                Text(
-                  "150",
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.white,
-                  ),
-                ),
-                Icon(
-                  Icons.mode_comment,
-                  size: 18,
-                  color: Colors.white,
-                )
-              ],
-            ),
-            onPressed: () {
-              // do something
-            },
-          )
-        ],
-      ),
-      body: new Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            new Expanded(
-              child: SingleChildScrollView(
-                child: Column(children: <Widget>[
-                  Container(
-                    padding: EdgeInsets.only(left: 10, right: 10, top: 10),
-                    child: Text(
-                      widget.newsData.headLine,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 20.0,
-                        fontWeight: FontWeight.bold,
-                        height: 1.5,
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    child: Stack(children: <Widget>[
-                      Image.network(
-                        'http://10.0.2.2/TourMendWebServices/Images/news/${widget.newsData.image}',
-                        fit: BoxFit.cover,
-                        height: 250,
-                      ),
-                    ]),
-                    padding: EdgeInsets.all(10),
-                  ),
-                  Container(
-                    padding: EdgeInsets.only(left: 10, right: 10, top: 10),
-                    child: Text(
-                      widget.newsData.des,
-                      textAlign: TextAlign.left,
-                      style: TextStyle(
-                        fontSize: 18.0,
-                        height: 1.5,
-                      ),
-                    ),
-                  ),
-                ]),
-              ),
-            ),
-            new Row(
-              children: <Widget>[
-                Container(
-                  width: 410,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black,
-                      ),
-                    ],
-                  ),
-                  child: new Row(
-                    children: <Widget>[
-                      Container(
-                        padding: EdgeInsets.all(7),
-                        width: 320,
-                        child: TextField(
-                          decoration: InputDecoration(
-                            focusedBorder: OutlineInputBorder(
-                              borderSide:
-                                  BorderSide(color: Colors.black, width: 1.0),
-                            ),
-                            contentPadding: EdgeInsets.all(10.0),
-                            enabledBorder: OutlineInputBorder(
-                              borderSide:
-                                  BorderSide(color: Colors.grey, width: 2.0),
-                            ),
-                            hintText: 'Add a Comment',
-                            prefixIcon: Icon(Icons.edit, color: Colors.grey),
-                          ),
-                          textAlign: TextAlign.left,
-                        ),
-                      ),
-                      InkWell(
-                          onTap: () => print("2"),
-                          child: Padding(
-                              padding: EdgeInsets.all(7.0),
-                              child: const Icon(Icons.mode_comment,
-                                  color: Colors.grey))),
-                      InkWell(
-                          onTap: () => showDialog(),
-                          child: Padding(
-                              padding: EdgeInsets.all(7.0),
-                              child:
-                                  const Icon(Icons.share, color: Colors.grey))),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ]),
     );
   }
 }

@@ -7,7 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../services/profileServices/profilePic.dart';
 
 class CustomDemo extends StatefulWidget {
-  File image;
+  final File image;
   CustomDemo(this.image);
 
   @override

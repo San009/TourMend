@@ -1,12 +1,15 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:ff_navigation_bar/ff_navigation_bar.dart';
-import 'package:flutter_app/screens/homePage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../services/getUserInfo.dart';
 import '../../screens/homePage.dart';
 import '../../screens/placesPage.dart';
 import '../../screens/eventsPage.dart';
 import '../../screens/newsPage.dart';
+import '../searchBar/searchBar.dart';
+import '../../screens/searchPage.dart';
+import '../../screens/galleryPage.dart';
 
 class MainPage extends StatefulWidget {
   MainPage({Key key, this.title}) : super(key: key);
@@ -18,52 +21,95 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  SharedPreferences logindata;
-  String username;
+  SharedPreferences preferences;
+  String userEmail, userImage, userName;
+  TextEditingController _search;
+  bool _canSearch, _showSearchBar;
+
   int _selectedIndex = 0;
   static const TextStyle optionStyle = TextStyle(fontSize: 30);
-  static List<Widget> _widgetOption = <Widget>[
+  final List<Widget> _widgetOption = <Widget>[
     HomePage(
-      title: 'Tourmend Home Page',
+      title: 'TourMend Home Page',
     ),
     PlacesPage(
       title: 'Places',
     ),
     EventsPage(),
     NewsPage(),
-    Text(
-      'Index 5: Saved',
-      style: optionStyle,
-    ),
+    GalleryPage(),
   ];
   int selectedIndex = 0;
 
   @override
   void initState() {
     super.initState();
-    initial();
+    _search = TextEditingController();
+    _canSearch = false;
+    _showSearchBar = true;
+    _getUserInfo();
   }
 
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: _onBackPressed,
-      child: new Scaffold(
-        body: Center(child: _widgetOption.elementAt(_selectedIndex)),
+      child: Scaffold(
+        body: Stack(
+          children: <Widget>[
+            Center(
+              child: _widgetOption.elementAt(_selectedIndex),
+            ),
+            Visibility(
+              visible: (_selectedIndex == 4) ? false : _showSearchBar,
+              child: SearchBar(
+                pageName: _getPageName(),
+                canSearch: _canSearch,
+                searchController: _search,
+                onValueChanged: (value) {
+                  if (value.isNotEmpty) {
+                    setState(() {
+                      _canSearch = true;
+                    });
+                  } else {
+                    setState(() {
+                      _canSearch = false;
+                    });
+                  }
+                },
+                onSubmit: (value) {
+                  if (value.isEmpty) {
+                    setState(() {
+                      _canSearch = false;
+                    });
+                    return;
+                  }
+                  _goToSearch(value);
+                },
+                onTap: () {
+                  _goToSearch(_search.text);
+                },
+                userEmail: userEmail,
+                userImage: userImage,
+                userName: userName,
+              ),
+            ),
+          ],
+        ),
         bottomNavigationBar: FFNavigationBar(
           theme: FFNavigationBarTheme(
             barBackgroundColor: Colors.white70,
-            selectedItemBorderColor: Colors.yellow,
-            selectedItemBackgroundColor: Colors.green,
+            selectedItemBorderColor: Colors.yellow[300],
+            selectedItemBackgroundColor: Colors.blue,
             selectedItemIconColor: Colors.white,
             selectedItemLabelColor: Colors.black,
           ),
-          selectedIndex: _selectedIndex,
           onSelectTab: (index) {
             setState(() {
               _selectedIndex = index;
             });
           },
+          selectedIndex: _selectedIndex,
           items: [
             FFNavigationBarItem(
               iconData: Icons.home,
@@ -91,10 +137,53 @@ class _MainPageState extends State<MainPage> {
     );
   }
 
-  void initial() async {
-    logindata = await SharedPreferences.getInstance();
+  String _getPageName() {
+    switch (_selectedIndex) {
+      case 0:
+        return 'maps';
+      case 1:
+        return 'places';
+      case 2:
+        return 'events';
+      case 3:
+        return 'news';
+      case 4:
+        return 'images';
+      default:
+        return null;
+    }
+  }
+
+  void _goToSearch(String value) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => SearchPage(
+          selectedIndex: _selectedIndex,
+          searchString: value,
+        ),
+      ),
+    );
+  }
+
+  void _getUserInfo() async {
+    preferences = await SharedPreferences.getInstance();
     setState(() {
-      username = logindata.getString('username');
+      userEmail = preferences.getString('user_email');
+    });
+
+    GetUserInfo.getUserName(userEmail).then((value) {
+      setState(() {
+        userName = value;
+      });
+      print(userName);
+    });
+
+    GetUserInfo.getUserImage(userEmail).then((value) {
+      setState(() {
+        userImage = value;
+      });
+      print(userImage);
     });
   }
 

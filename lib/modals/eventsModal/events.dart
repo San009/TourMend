@@ -1,6 +1,7 @@
 class EventsData {
   String id;
   String userName;
+  String userImage;
   String eventType;
   String eventName;
   String eventAddress;
@@ -12,6 +13,7 @@ class EventsData {
   EventsData(
       {this.id,
       this.userName,
+      this.userImage,
       this.eventType,
       this.eventName,
       this.eventAddress,
@@ -24,6 +26,7 @@ class EventsData {
     return EventsData(
       id: json['id'],
       userName: json['userName'],
+      userImage: json['userImage'],
       eventType: json['eventType'],
       eventName: json['eventName'],
       eventAddress: json['eventAddress'],

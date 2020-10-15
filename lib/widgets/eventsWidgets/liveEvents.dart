@@ -149,7 +149,7 @@ class LiveEventsPageState extends State<LiveEventsPage>
                   children: <Widget>[
                     Container(
                       height: 35,
-                      width: 325,
+                      width: 310,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(5.0),
                         border: Border.all(
@@ -306,7 +306,7 @@ class LiveEventsPageState extends State<LiveEventsPage>
                   children: <Widget>[
                     Container(
                       height: 150,
-                      width: 325,
+                      width: 310,
                       decoration: BoxDecoration(
                         border: Border.all(
                           color: Colors.black,

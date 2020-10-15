@@ -21,7 +21,7 @@ class PlaceCard extends StatelessWidget {
           Padding(
             padding: EdgeInsets.only(bottom: 10.0),
             child: Image.network(
-              'http://10.0.2.2/TourMendWebServices/Images/places/${placesData[index].placeImage}',
+              'http://10.0.2.2/TourMendWebServices/Images/places/${placesData[index].image}',
               fit: BoxFit.cover,
             ),
           ),
@@ -33,9 +33,8 @@ class PlaceCard extends StatelessWidget {
                   bottom: 10.0,
                 ),
                 child: Text(
-                  placesData[index].placeName,
-                  style:
-                      new TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                  placesData[index].name,
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                   textAlign: TextAlign.right,
                 ),
               ),

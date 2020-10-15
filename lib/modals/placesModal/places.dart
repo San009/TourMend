@@ -1,17 +1,17 @@
 class PlacesData {
   String id;
-  String placeName;
+  String name;
   String destination;
-  String placeImage;
+  String image;
   String info;
   String itinerary;
   String map;
 
   PlacesData(
       {this.id,
-      this.placeName,
+      this.name,
       this.destination,
-      this.placeImage,
+      this.image,
       this.info,
       this.itinerary,
       this.map});
@@ -19,9 +19,9 @@ class PlacesData {
   factory PlacesData.fromJson(Map<String, dynamic> json) {
     return PlacesData(
       id: json['id'],
-      placeName: json['placeName'],
+      name: json['name'],
       destination: json['destination'],
-      placeImage: json['img'],
+      image: json['image'],
       info: json['info'],
       itinerary: json['itinerary'],
       map: json['map'],

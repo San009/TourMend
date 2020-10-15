@@ -15,7 +15,7 @@ class _ReportEventState extends State<ReportEventPage>
   void initState() {
     super.initState();
 
-    _nestedTabController = new TabController(length: 2, vsync: this);
+    _nestedTabController = TabController(length: 2, vsync: this);
   }
 
   @override
@@ -27,11 +27,12 @@ class _ReportEventState extends State<ReportEventPage>
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          iconTheme: IconThemeData(color: Colors.white),
           title: Text(
             'Report Events',
             style: TextStyle(
               decoration: TextDecoration.none,
-              color: Colors.black87,
+              color: Colors.white,
             ),
           ),
         ),

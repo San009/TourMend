@@ -4,10 +4,9 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_app/widgets/jsonListViewWidget/jsonListView.dart';
 import 'package:flutter_app/widgets/placesPageWidgets/placeCard.dart';
 import 'package:flutter_app/widgets/placesPageWidgets/nestedTabBar.dart';
-import 'package:flutter_app/widgets/placesPageWidgets/searchBar.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../services/fetchPlaces.dart';
 import '../modals/placesModal/places.dart';
-import '../widgets/placesPageWidgets/searchPage.dart';
 
 class PlacesPage extends StatefulWidget {
   final String title;
@@ -18,19 +17,17 @@ class PlacesPage extends StatefulWidget {
 }
 
 class _PlacesPageState extends State<PlacesPage> {
-  TextEditingController _search;
+  SharedPreferences preferences;
   List<PlacesData> _placesData;
   ScrollController _scrollController;
   int _pageNumber;
-  bool _isLoading, _canSearch, _showSearchBar;
+  bool _isLoading, _showSearchBar;
   @override
   void initState() {
     super.initState();
     _scrollController = ScrollController();
-    _search = TextEditingController();
     _pageNumber = 1;
     _isLoading = true;
-    _canSearch = false;
     _showSearchBar = true;
     _placesData = List();
 
@@ -64,76 +61,41 @@ class _PlacesPageState extends State<PlacesPage> {
   }
 
   @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: <Widget>[
-          Container(
-            padding: _showSearchBar
-                ? EdgeInsets.only(top: 55.0)
-                : EdgeInsets.only(top: 0.0),
-            child: FutureBuilder<List<PlacesData>>(
-              initialData: _placesData,
-              future: _fetchPlaces(),
-              builder: (context, snapshot) {
-                if (_isLoading) {
-                  return Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
-
-                return JsonListView(
-                  snapshot: snapshot,
-                  listData: _placesData,
-                  scrollController: _scrollController,
-                  onTapWidget: (value) => NestedTabBar(
-                    placeData: _placesData[value],
-                  ),
-                  childWidget: (value) => PlaceCard(
-                    placesData: _placesData,
-                    index: value,
-                  ),
+      body: RefreshIndicator(
+        onRefresh: () => _fetchPlaces().then((value) => {
+              // do something
+            }),
+        child: Container(
+          padding: _showSearchBar
+              ? EdgeInsets.only(top: 55.0)
+              : EdgeInsets.only(top: 0.0),
+          child: FutureBuilder<List<PlacesData>>(
+            initialData: _placesData,
+            future: _fetchPlaces(),
+            builder: (context, snapshot) {
+              if (_isLoading) {
+                return Center(
+                  child: CircularProgressIndicator(),
                 );
-              },
-            ),
+              }
+
+              return JsonListView(
+                snapshot: snapshot,
+                listData: _placesData,
+                scrollController: _scrollController,
+                onTapWidget: (value) => NestedTabBar(
+                  placeData: _placesData[value],
+                ),
+                childWidget: (value) => PlaceCard(
+                  placesData: _placesData,
+                  index: value,
+                ),
+              );
+            },
           ),
-          Visibility(
-            visible: _showSearchBar,
-            child: SearchBar(
-              canSearch: _canSearch,
-              searchController: _search,
-              onValueChanged: (value) {
-                if (value.isNotEmpty) {
-                  setState(() {
-                    _canSearch = true;
-                  });
-                } else {
-                  setState(() {
-                    _canSearch = false;
-                  });
-                }
-              },
-              onSubmit: (value) {
-                if (value.isEmpty) {
-                  setState(() {
-                    _canSearch = false;
-                  });
-                  return;
-                }
-                _goToSearch(value);
-              },
-              onTap: () {
-                _goToSearch(_search.text);
-              },
-            ),
-          )
-        ],
+        ),
       ),
     );
   }
@@ -143,18 +105,8 @@ class _PlacesPageState extends State<PlacesPage> {
         .then((value) => value.places);
   }
 
-  void _goToSearch(String value) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => SearchPage(
-          searchString: value,
-        ),
-      ),
-    );
-  }
-
   void _handleScroll() async {
+    preferences = await SharedPreferences.getInstance();
     _scrollController.addListener(() {
       if (_scrollController.position.userScrollDirection ==
               ScrollDirection.reverse &&
@@ -170,5 +122,11 @@ class _PlacesPageState extends State<PlacesPage> {
         });
       }
     });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 }

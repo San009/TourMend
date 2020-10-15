@@ -209,7 +209,7 @@ class RegularEventsPageState extends State<RegularEventsPage>
                       children: <Widget>[
                         Container(
                           height: 150,
-                          width: 325,
+                          width: 310,
                           decoration: BoxDecoration(
                             border: Border.all(
                               color: Colors.black,

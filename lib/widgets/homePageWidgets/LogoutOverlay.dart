@@ -3,11 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../screens/loginPage.dart';
 
 class LogoutOverlay extends StatefulWidget {
-  @override
-  final String userEmail;
-  final Function logoutFunciton;
-  LogoutOverlay({Key key, this.userEmail, this.logoutFunciton})
-      : super(key: key);
+  LogoutOverlay({Key key}) : super(key: key);
   State<StatefulWidget> createState() => LogoutOverlayState();
 }
 
@@ -17,6 +13,7 @@ class LogoutOverlayState extends State<LogoutOverlay>
   Animation<double> scaleAnimation;
   SharedPreferences preferences;
   String userEmail;
+
   @override
   void initState() {
     super.initState();
@@ -45,7 +42,7 @@ class LogoutOverlayState extends State<LogoutOverlay>
               padding: EdgeInsets.all(15.0),
               height: 180.0,
               decoration: ShapeDecoration(
-                  color: Color.fromRGBO(41, 167, 77, 10),
+                  color: Color.fromRGBO(50, 200, 100, 5),
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15.0))),
               child: Column(
@@ -77,7 +74,7 @@ class LogoutOverlayState extends State<LogoutOverlay>
                                 'Logout',
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
-                                    color: Colors.green,
+                                    color: Colors.red[400],
                                     fontWeight: FontWeight.bold,
                                     fontSize: 13.0),
                               ),
@@ -109,7 +106,7 @@ class LogoutOverlayState extends State<LogoutOverlay>
                                   'Cancel',
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
-                                      color: Colors.green,
+                                      color: Colors.blue[600],
                                       fontWeight: FontWeight.bold,
                                       fontSize: 13.0),
                                 ),

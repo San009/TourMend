@@ -24,8 +24,8 @@ if (isset($_GET['page_number'])) {
             while ($row = mysqli_fetch_assoc($result)) {
                 $rowItems = array(
                     'id' => $row['id'],
-                    'placeName' => $row['name'],
-                    'img' => $row['image'],
+                    'name' => $row['name'],
+                    'image' => $row['image'],
                     'destination' => $row['destination'],
                     'info' => $row['info'],
                     'itinerary' => $row['itinerary'],

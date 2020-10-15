@@ -23,7 +23,7 @@ if (isset($_GET['page_number'])) {
             $rowArray =  array();
 
             while ($row = mysqli_fetch_assoc($result)) {
-                $getUser = "SELECT username FROM user_info WHERE id = '" . $row['user_id'] . "'";
+                $getUser = "SELECT username, image FROM user_info WHERE id = '" . $row['user_id'] . "'";
                 $resultUser = mysqli_query($db_conn, $getUser);
 
                 // if else
@@ -33,6 +33,7 @@ if (isset($_GET['page_number'])) {
                 $rowItems = array(
                     'id' => $row['id'],
                     'userName' => $assocUser['username'],
+                    'userImage' => $assocUser['image'],
                     'eventType' => $row['type'],
                     'eventName' => $row['name'],
                     'eventAddress' => $row['address'],

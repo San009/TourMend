@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter_app/modals/eventsModal/events.dart';
-import 'package:flutter_app/services/eventServices/fetchEvents.dart';
-import 'package:flutter_app/widgets/eventsWidgets/eventCard.dart';
-import 'package:flutter_app/widgets/jsonListViewWidget/jsonListView.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../widgets/eventsWidgets/reportEvent.dart';
+import '../modals/eventsModal/events.dart';
+import '../services/eventServices/fetchEvents.dart';
+import '../services/getUserInfo.dart';
+import '../widgets/eventsWidgets/eventCard.dart';
+import '../widgets/jsonListViewWidget/jsonListView.dart';
 
 class EventsPage extends StatefulWidget {
   final String title;
@@ -15,25 +17,33 @@ class EventsPage extends StatefulWidget {
 }
 
 class _EventPageState extends State<EventsPage> {
+  SharedPreferences preferences;
   List<EventsData> eventsData = List();
   ScrollController _scrollController;
   int _pageNumber;
   bool _isLoading, _showButton;
+  String userImage;
+
+  bool _showSearchBar;
 
   @override
   void initState() {
     super.initState();
     _scrollController = ScrollController();
+
+    _showSearchBar = true;
     _pageNumber = 1;
     _isLoading = true;
     _showButton = true;
 
     _fetchEvents().then((result) {
-      for (var event in result) {
-        eventsData.add(event);
+      if (result != null) {
         setState(() {
           _isLoading = false;
         });
+        for (var event in result) {
+          eventsData.add(event);
+        }
       }
     });
 
@@ -55,57 +65,53 @@ class _EventPageState extends State<EventsPage> {
     });
 
     _handleScroll();
+    _getUserImage();
   }
 
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
+  void _getUserImage() async {
+    preferences = await SharedPreferences.getInstance();
+    var userEmail = preferences.getString('user_email');
+
+    GetUserInfo.getUserImage(userEmail).then((value) {
+      setState(() {
+        userImage = value;
+      });
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-          leading: Padding(
-            padding: const EdgeInsets.only(left: 20.0),
-            child: Icon(
-              Icons.event_available,
-              size: 30,
-              color: Colors.black87,
-            ),
-          ),
-          title: Text(
-            'All Events ',
-            style: TextStyle(
-              decoration: TextDecoration.none,
-              color: Colors.black87,
-            ),
-          )),
-      body: Container(
-        child: FutureBuilder<List<EventsData>>(
-          initialData: eventsData,
-          future: _fetchEvents(),
-          builder: (context, snapshot) {
-            if (_isLoading) {
-              return Center(
-                child: CircularProgressIndicator(),
-              );
-            }
+      body: RefreshIndicator(
+        onRefresh: () => _fetchEvents().then((value) {
+          // do something
+        }),
+        child: Container(
+          padding: _showSearchBar
+              ? EdgeInsets.only(top: 55.0)
+              : EdgeInsets.only(top: 0.0),
+          child: FutureBuilder<List<EventsData>>(
+            initialData: eventsData,
+            future: _fetchEvents(),
+            builder: (context, snapshot) {
+              if (_isLoading) {
+                return Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
 
-            return RefreshIndicator(
-              onRefresh: () => _fetchEvents().then((value) => null),
-              child: JsonListView(
+              return JsonListView(
                 snapshot: snapshot,
                 listData: eventsData,
                 scrollController: _scrollController,
                 childWidget: (value) => EventCard(
                   eventsData: eventsData,
                   index: value,
+                  userImage: userImage,
                 ),
-              ),
-            );
-          },
+              );
+            },
+          ),
         ),
       ),
       floatingActionButton: Visibility(
@@ -140,17 +146,26 @@ class _EventPageState extends State<EventsPage> {
   void _handleScroll() async {
     _scrollController.addListener(() {
       if (_scrollController.position.userScrollDirection ==
-          ScrollDirection.reverse) {
+              ScrollDirection.reverse &&
+          _scrollController.position.pixels >= 36) {
         setState(() {
           _showButton = false;
+          _showSearchBar = false;
         });
       }
       if (_scrollController.position.userScrollDirection ==
           ScrollDirection.forward) {
         setState(() {
           _showButton = true;
+          _showSearchBar = true;
         });
       }
     });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 }

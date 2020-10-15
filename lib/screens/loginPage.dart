@@ -114,9 +114,9 @@ class _LoginPageState extends State<LoginPage> {
 
   void _checkIfAlreadyLogin() async {
     _loginData = await SharedPreferences.getInstance();
-    final newuser = (_loginData.getBool('login') ?? true);
-    print(newuser);
-    if (newuser == false) {
+    final isBool = (_loginData.getBool('login') ?? true);
+    print(isBool);
+    if (isBool == false) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(

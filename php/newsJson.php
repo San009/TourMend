@@ -18,7 +18,7 @@ if (isset($_GET['page_number'])) {
     if ($result) {
         if (mysqli_num_rows($result) <= 6 && mysqli_num_rows($result) != 0) {
             $response['statusCode'] = '1';
-            $response['message'] = 'Data fetched successfully!';
+            $response['message'] = 'News fetched successfully!';
             $rowArray =  array();
 
             while ($row = mysqli_fetch_assoc($result)) {
@@ -26,8 +26,8 @@ if (isset($_GET['page_number'])) {
                     'id' => $row['id'],
                     'headLine' => $row['headLine'],
                     'image' => $row['image'],
-                    'des'=> $row['des'],
-                    
+                    'des' => $row['des'],
+
                 );
                 array_push($rowArray, $rowItems);
             }

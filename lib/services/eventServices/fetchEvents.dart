@@ -20,6 +20,7 @@ class FetchEvents {
             var eventData = EventsData(
               id: event['id'],
               userName: event['userName'],
+              userImage: event['userImage'],
               eventType: event['eventType'],
               eventName: event['eventName'],
               eventAddress: event['eventAddress'],

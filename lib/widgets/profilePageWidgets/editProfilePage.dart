@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_app/modals/profileModal/userInfo.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import '../../services/profileServices/editinfo.dart';
@@ -9,10 +10,10 @@ import 'dart:ui';
 import 'dart:async';
 
 class EditProfilePage extends StatefulWidget {
-  final String title, userName, email;
+  final String title;
+  final UserInfo userInfo;
 
-  EditProfilePage({Key key, this.title, this.userName, this.email})
-      : super(key: key);
+  EditProfilePage({Key key, this.title, this.userInfo}) : super(key: key);
   static void startProgress() {}
 
   @override
@@ -33,14 +34,9 @@ class EditProfilePageState extends State<EditProfilePage>
   TextEditingController _password;
   SharedPreferences currentEmail;
   String email;
-  bool _isLoading = false;
   AnimationController progressController;
   Animation<double> animation;
-  double _percentage;
-  double _nextPercentage;
-  Timer _timer;
-  AnimationController _progressAnimationController;
-  bool _progressDone;
+
   Function startProgress;
 
   @override
@@ -51,12 +47,6 @@ class EditProfilePageState extends State<EditProfilePage>
     _username = TextEditingController();
     _password = TextEditingController();
     email = '';
-
-    super.initState();
-    _percentage = 0.0;
-    _nextPercentage = 0.0;
-    _timer = null;
-    _progressDone = false;
   }
 
   @override
@@ -116,7 +106,7 @@ class EditProfilePageState extends State<EditProfilePage>
                                         fit: BoxFit.fill,
                                       )
                                     : Image.network(
-                                        "http://10.0.2.2/TourMendWebServices/Images/person.jpg",
+                                        "http://10.0.2.2/TourMendWebServices/Images/profileImages/${widget.userInfo.userImage}",
                                         fit: BoxFit.fill,
                                       ),
                               ),
@@ -129,7 +119,7 @@ class EditProfilePageState extends State<EditProfilePage>
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
                                 CircleAvatar(
-                                    backgroundColor: Colors.red,
+                                    backgroundColor: Colors.blueAccent,
                                     radius: 25.0,
                                     child: IconButton(
                                       icon: Icon(
@@ -436,44 +426,44 @@ class EditProfilePageState extends State<EditProfilePage>
         mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
           Expanded(
-            child: Padding(
-              padding: EdgeInsets.only(right: 10.0),
-              child: Container(
-                  child: RaisedButton(
-                child: Text("Upload profile pic"),
-                textColor: Colors.white,
-                color: Colors.green,
-                onPressed: () {
-                  if (_image != null) {
-                    showDialog(
-                        context: context,
-                        child: CustomDemo(
-                          _image,
-                        ));
-                  } else {
-                    showDialog(
+            flex: 3,
+            child: RaisedButton(
+              child: Text(
+                "Upload profile picture",
+                style: TextStyle(fontSize: 14.5),
+              ),
+              textColor: Colors.white,
+              color: Colors.green,
+              elevation: 5.0,
+              onPressed: () {
+                if (_image != null) {
+                  showDialog(
                       context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: Text('Sorry!\nSelect Your profile image '),
-                          actions: <Widget>[
-                            FlatButton(
-                              child: Text("OK"),
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                            ),
-                          ],
-                        );
-                      },
-                    );
-                  }
-                },
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20.0)),
-              )),
+                      child: CustomDemo(
+                        _image,
+                      ));
+                } else {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: Text('Sorry!\nSelect Your profile image '),
+                        actions: <Widget>[
+                          FlatButton(
+                            child: Text("OK"),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                }
+              },
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20.0)),
             ),
-            flex: 2,
           ),
         ],
       ),
@@ -483,7 +473,7 @@ class EditProfilePageState extends State<EditProfilePage>
   Widget _getEditIcon() {
     return GestureDetector(
       child: CircleAvatar(
-        backgroundColor: Colors.red,
+        backgroundColor: Colors.blueAccent,
         radius: 14.0,
         child: Icon(
           Icons.edit,

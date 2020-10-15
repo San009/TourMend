@@ -4,23 +4,20 @@ import 'package:location/location.dart';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'loginPage.dart';
-import 'customDialogBox.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import '../services/profileServices/getUserInfo.dart';
+// import '../services/profileServices/getUserInfo.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key key, this.title}) : super(key: key);
 
   final String title;
-
   @override
   _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
   SharedPreferences preferences;
-  String userImage, userEmail;
+  String userEmail, userImage, userName;
 
   final CameraPosition _initialPosition =
       CameraPosition(target: LatLng(28.260075, 83.970093), zoom: 13.0);
@@ -43,8 +40,6 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    userImage = '';
-    _getUserEmail();
   }
 
   @override
@@ -64,60 +59,6 @@ class _HomePageState extends State<HomePage> {
           },
           markers: _markers.toSet(),
           circles: Set.of((_circle != null) ? [_circle] : []),
-        ),
-        Positioned(
-          top: 30,
-          right: 15,
-          left: 15,
-          child: Container(
-            decoration: BoxDecoration(
-              boxShadow: [
-                BoxShadow(
-                    color: Colors.grey[400],
-                    offset: Offset(0.0, 5.0),
-                    blurRadius: 20.0,
-                    spreadRadius: 2.0)
-              ],
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(15.0),
-            ),
-            child: Row(
-              children: <Widget>[
-                Expanded(
-                  child: TextField(
-                    cursorColor: Colors.black,
-                    keyboardType: TextInputType.text,
-                    textInputAction: TextInputAction.search,
-                    decoration: InputDecoration(
-                      border: InputBorder.none,
-                      contentPadding: EdgeInsets.symmetric(horizontal: 15),
-                      hintText: "Search here",
-                      hintStyle: TextStyle(
-                        fontSize: 18.0,
-                        color: Colors.grey[500],
-                      ),
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(right: 8.0),
-                  child: InkWell(
-                    onTap: () {
-                      showDialog(
-                          context: context,
-                          child: CustomDialogBox(
-                            userEmail: userEmail,
-                          ));
-                    },
-                    child: CircleAvatar(
-                      radius: 15.0,
-                      backgroundColor: Colors.blue,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
         ),
       ]),
     );
@@ -177,19 +118,6 @@ class _HomePageState extends State<HomePage> {
         debugPrint("Permission Denied");
       }
     }
-  }
-
-  _getUserEmail() async {
-    preferences = await SharedPreferences.getInstance();
-    userEmail = preferences.getString('user_email');
-
-    GetUserInfo.getUserImage(userEmail).then((result) {
-      if (result != null) {
-        setState(() {
-          userImage = result;
-        });
-      }
-    });
   }
 
   @override

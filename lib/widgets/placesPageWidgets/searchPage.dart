@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_app/screens/placesPage.dart';
 import '../jsonListViewWidget/jsonListView.dart';
 import 'placeCard.dart';
 import 'nestedTabBar.dart';
@@ -9,8 +8,11 @@ import '../../modals/placesModal/places.dart';
 
 class SearchPage extends StatefulWidget {
   final String searchString;
+  final int selectedIndex;
 
-  SearchPage({Key key, this.searchString}) : super(key: key);
+  SearchPage(
+      {Key key, @required this.searchString, @required this.selectedIndex})
+      : super(key: key);
   @override
   _SearchPageState createState() => _SearchPageState();
 }
@@ -36,32 +38,10 @@ class _SearchPageState extends State<SearchPage> {
             isLoading = false;
           });
         }
-      } else {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Row(children: [
-                Image.network(
-                  'http://10.0.2.2/TourMendWebServices/Images/noresult.png',
-                  width: 100,
-                  height: 100,
-                  fit: BoxFit.contain,
-                ),
-                Text('Oops!\n No result found!. ')
-              ]),
-              actions: <Widget>[
-                FlatButton(
-                  child: new Text("OK"),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                ),
-              ],
-            );
-          },
-        );
-      }
+      } else
+        setState(() {
+          isLoading = false;
+        });
     });
 
     _scrollController.addListener(() {
@@ -106,6 +86,31 @@ class _SearchPageState extends State<SearchPage> {
               );
             }
 
+            if (placesData.isEmpty) {
+              return Container(
+                alignment: Alignment.center,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Image.network(
+                      'http://10.0.2.2/TourMendWebServices/Images/noresult.png',
+                      width: 200,
+                      height: 200,
+                      fit: BoxFit.contain,
+                    ),
+                    Text(
+                      'Oops!\nNo result found!.',
+                      style: TextStyle(
+                        fontSize: 20.0,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
+
             return JsonListView(
               snapshot: snapshot,
               listData: placesData,
@@ -125,6 +130,7 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   Future<List<PlacesData>> _search() {
+    // check seletedIndex and retrun different search result
     return FetchPlaces.search(widget.searchString, pageNumber: pageNumber)
         .then((value) => value.places);
   }

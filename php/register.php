@@ -37,7 +37,7 @@ if (isset($_POST['username'], $_POST['email'], $_POST['password'])) {
         $body = "Hi, $username! Welcome to the TourMend. Enter the link below to activate your account
 							http://localhost/TourMendWebServices/activate.php?email=$email";
 
-        $sender = "kailashkandel2@gmail.com";
+        $sender = "TourMend.MP@gmail.com";
 
         $activationMail->isHTML(true);
         $activationMail->setFrom($sender, "TourMend App");
@@ -49,7 +49,7 @@ if (isset($_POST['username'], $_POST['email'], $_POST['password'])) {
         if ($activationMail->send()) {
             $hashedPassword = sha1($password);
             $status = "inactive";
-            $sql = "INSERT INTO user_info (username, email, password, reset_code, status) VALUES ('$username', '$email', '$hashedPassword', '', '$status')";
+            $sql = "INSERT INTO user_info (username, email, password, image, reset_code, status) VALUES ('$username', '$email', '$hashedPassword', '', '', '$status')";
 
             $executeQurey = mysqli_query($db_conn, $sql);
 

@@ -61,7 +61,7 @@ class _NestedTabBarState extends State<NestedTabBar>
           Padding(
             child: Stack(children: <Widget>[
               Image.network(
-                'http://10.0.2.2/TourMendWebServices/Images/places/${widget.placeData.placeImage}',
+                'http://10.0.2.2/TourMendWebServices/Images/places/${widget.placeData.image}',
                 fit: BoxFit.cover,
                 height: 250,
               ),

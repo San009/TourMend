@@ -1,32 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app/modals/profileModal/userInfo.dart';
 import '../widgets/homePageWidgets/customListTile.dart';
 import 'profilePage.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../services/profileServices/getUserInfo.dart';
 import '../widgets/homePageWidgets/LogoutOverlay.dart';
 
 class CustomDialogBox extends StatefulWidget {
-  final String userEmail;
-  final Function logoutFunciton;
-  CustomDialogBox({Key key, this.userEmail, this.logoutFunciton})
+  final String userEmail, userImage, userName;
+
+  CustomDialogBox({Key key, this.userEmail, this.userImage, this.userName})
       : super(key: key);
-  @override
+
   _CustomDialogBoxState createState() => new _CustomDialogBoxState();
 }
 
 class _CustomDialogBoxState extends State<CustomDialogBox> {
-  String userEmail;
-  Function logoutFunciton;
-  String userName, userImage, email;
-  SharedPreferences currentEmail;
-
+  UserInfo userInfo;
   @override
   void initState() {
     super.initState();
-    userName = '';
-    email = '';
-    userImage = '';
-    _getUserInfo();
+    userInfo = UserInfo(
+      userName: widget.userName,
+      userEmail: widget.userEmail,
+      userImage: widget.userImage,
+    );
   }
 
   @override
@@ -34,7 +30,7 @@ class _CustomDialogBoxState extends State<CustomDialogBox> {
     return SimpleDialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
       backgroundColor: Colors.grey[300],
-      titlePadding: EdgeInsets.fromLTRB(20.0, 40.0, 20.0, 20.0),
+      titlePadding: EdgeInsets.fromLTRB(20.0, 30.0, 20.0, 10.0),
       contentPadding: EdgeInsets.only(top: 10),
       elevation: 20.0,
       title: Container(
@@ -42,15 +38,32 @@ class _CustomDialogBoxState extends State<CustomDialogBox> {
           children: <Widget>[
             Padding(
                 padding: const EdgeInsets.only(bottom: 15.0),
-                child: CircleAvatar(
-                  radius: 40.0,
-                  backgroundColor: Colors.blue,
-                  backgroundImage: NetworkImage(
-                    "http://10.0.2.2/TourMendWebServices/Images/profileImages/$userImage",
-                  ),
-                )),
+                child: (widget.userImage != null)
+                    ? CircleAvatar(
+                        radius: 90.0,
+                        backgroundImage: NetworkImage(
+                          "http://10.0.2.2/TourMendWebServices/Images/profileImages/${widget.userImage}",
+                        ),
+                      )
+                    : CircleAvatar(
+                        radius: 40.0,
+                        backgroundColor: Colors.blue,
+                      )),
             Center(
-              child: Text(userName),
+              child: Column(
+                children: <Widget>[
+                  Text(
+                    widget.userName,
+                  ),
+                  SizedBox(
+                    height: 5.0,
+                  ),
+                  Text(
+                    widget.userEmail,
+                    style: TextStyle(fontSize: 15),
+                  ),
+                ],
+              ),
             )
           ],
         ),
@@ -74,10 +87,11 @@ class _CustomDialogBoxState extends State<CustomDialogBox> {
                       () => Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => ProfilePage(),
+                            builder: (context) =>
+                                ProfilePage(userInfo: userInfo),
                           ))),
                   CustomListTile(Icons.notifications, 'Notification', () => {}),
-                  CustomListTile(Icons.settings, 'Setting', () => {}),
+                  CustomListTile(Icons.settings, 'Settings', () => {}),
                   CustomListTile(
                       Icons.lock,
                       'Log Out',
@@ -92,28 +106,5 @@ class _CustomDialogBoxState extends State<CustomDialogBox> {
             )),
       ],
     );
-  }
-
-  void _getUserInfo() async {
-    currentEmail = await SharedPreferences.getInstance();
-    setState(() {
-      email = currentEmail.getString('user_email');
-    });
-
-    GetUserInfo.getUserInfo(email).then((result) {
-      if (result != null) {
-        setState(() {
-          userName = result;
-        });
-      }
-    });
-    GetUserInfo.getUserImage(email).then((result) {
-      if (result != null) {
-        setState(() {
-          userImage = result;
-          print(userImage);
-        });
-      }
-    });
   }
 }

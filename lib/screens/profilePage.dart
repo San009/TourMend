@@ -1,27 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_app/services/profileServices/getUserInfo.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_app/modals/profileModal/userInfo.dart';
 import '../widgets/profilePageWidgets/editProfilePage.dart';
 
 class ProfilePage extends StatefulWidget {
   final String title;
-  ProfilePage({Key key, this.title}) : super(key: key);
+  final UserInfo userInfo;
+  ProfilePage({Key key, this.title, this.userInfo}) : super(key: key);
   @override
   _ProfilePageState createState() => new _ProfilePageState();
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  // bool _isLoading = false;
-  String userName, userImage, email;
-  SharedPreferences currentEmail;
-
   @override
   void initState() {
     super.initState();
-    userName = '';
-    email = '';
-    userImage = '';
-    _getUserInfo();
   }
 
   @override
@@ -30,56 +22,67 @@ class _ProfilePageState extends State<ProfilePage> {
       body: new Stack(
         children: <Widget>[
           ClipPath(
-            child: Container(color: Colors.black.withOpacity(0.8)),
+            child: Container(color: Colors.black.withOpacity(0.7)),
             clipper: GetClipper(),
           ),
           Positioned(
               width: 350.0,
               top: MediaQuery.of(context).size.height / 8,
+              left: 30.0,
               child: Column(
                 children: <Widget>[
-                  Align(
-                      alignment: Alignment.center,
-                      child: Container(
-                          width: 170.0,
-                          height: 170.0,
-                          decoration: BoxDecoration(
-                              color: Colors.red,
-                              image: DecorationImage(
-                                  image: NetworkImage(
-                                    "http://10.0.2.2/TourMendWebServices/Images/profileImages/$userImage",
-                                  ),
-                                  fit: BoxFit.cover),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(85.0)),
-                              boxShadow: [
-                                BoxShadow(blurRadius: 7.0, color: Colors.black)
-                              ]))),
-
-                  new Row(children: <Widget>[
+                  Container(
+                    width: 170.0,
+                    height: 170.0,
+                    margin: EdgeInsets.only(bottom: 10.0),
+                    decoration: BoxDecoration(
+                      color: Colors.blue,
+                      image: DecorationImage(
+                          image: NetworkImage(
+                            "http://10.0.2.2/TourMendWebServices/Images/profileImages/${widget.userInfo.userImage}",
+                          ),
+                          fit: BoxFit.cover),
+                      borderRadius: BorderRadius.all(Radius.circular(85.0)),
+                      boxShadow: [
+                        BoxShadow(
+                            blurRadius: 10.0,
+                            offset: Offset(10.0, 20.0),
+                            color: Colors.grey[400],
+                            spreadRadius: 2.0)
+                      ],
+                    ),
+                  ),
+                  Row(children: <Widget>[
                     Expanded(
                         child: SizedBox(
-                      height: 195.0,
-                      child: new ListView(children: <Widget>[
+                      height: 160.0,
+                      child: ListView(children: <Widget>[
                         ListTile(
+                          contentPadding: EdgeInsets.only(left: 5.0),
+                          visualDensity: VisualDensity(
+                            horizontal: VisualDensity.maximumDensity,
+                          ),
                           leading: Icon(
                             Icons.account_circle,
-                            color: Colors.pink,
+                            color: Colors.green,
                             size: 35,
                           ),
                           title: Text(
                             'Name',
                             style: TextStyle(fontSize: 20),
                           ),
-                          subtitle: Text(userName),
+                          subtitle: Text(widget.userInfo.userName),
                         ),
                         ListTile(
+                          contentPadding: EdgeInsets.only(left: 5.0),
+                          visualDensity: VisualDensity(
+                              horizontal: VisualDensity.maximumDensity),
                           leading: Icon(
                             Icons.email,
-                            color: Colors.pink,
+                            color: Colors.green,
                             size: 35,
                           ),
-                          subtitle: Text(email),
+                          subtitle: Text(widget.userInfo.userEmail),
                           title: Text(
                             'Email',
                             style: TextStyle(fontSize: 20),
@@ -88,9 +91,6 @@ class _ProfilePageState extends State<ProfilePage> {
                       ]),
                     ))
                   ]),
-                  //MyApp(),
-                  Divider(color: Colors.black),
-
                   SizedBox(
                     height: 0,
                   ),
@@ -105,38 +105,22 @@ class _ProfilePageState extends State<ProfilePage> {
               MaterialPageRoute(
                 builder: (context) => EditProfilePage(
                   title: 'Edit Profile',
-                  userName: userName,
-                  email: email,
+                  userInfo: widget.userInfo,
                 ),
               ));
         },
-        label: Text('Edit'),
-        icon: Icon(Icons.edit),
+        label: Text(
+          'Edit',
+          style: TextStyle(fontSize: 18.0),
+        ),
+        icon: Icon(
+          Icons.edit,
+          size: 20.0,
+        ),
         backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
       ),
     );
-  }
-
-  void _getUserInfo() async {
-    currentEmail = await SharedPreferences.getInstance();
-    setState(() {
-      email = currentEmail.getString('user_email');
-    });
-
-    GetUserInfo.getUserInfo(email).then((result) {
-      if (result != null) {
-        setState(() {
-          userName = result;
-        });
-      }
-    });
-    GetUserInfo.getUserImage(email).then((result) {
-      if (result != null) {
-        setState(() {
-          userImage = result;
-        });
-      }
-    });
   }
 }
 

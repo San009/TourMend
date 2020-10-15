@@ -4,7 +4,7 @@ import '../modals/newsModal/news.dart';
 import 'package:http/http.dart' as http;
 
 class FetchNews {
-  static Future<NewsList> fetchnews({int pageNumber}) async {
+  static Future<NewsList> fetchNews({int pageNumber}) async {
     final news = List<NewsData>();
     try {
       final url =
